@@ -1,0 +1,43 @@
+version: 2.1
+description: Common yarn commands
+
+commands:
+  # https://circleci.com/docs/2.0/caching/#basic-example-of-dependency-caching
+  save_cache:
+    steps:
+      - save_cache:
+          key: yarn-deps-{{ checksum "yarn.lock" }}
+          paths:
+            - ./node_modules
+
+  # If there isn't a match to the first key, it'll do a partial match of the
+  # second. That means after the first cache save there will always be a cache
+  # hit, but it might be an older version of the cache
+  #
+  # https://circleci.com/docs/2.0/caching/#restoring-cache
+  restore_cache:
+    steps:
+      - restore_cache:
+          keys:
+            - yarn-deps-{{ checksum "yarn.lock" }}
+            - yarn-deps-
+
+  # By default when yarn runs it does not check the filesystem to ensure the
+  # packages it expects to be installed are actually installed. Using the
+  # --check-files flag ensures that any packages or files missing or out of date
+  # on the file system (i.e. those which might be restored from cache) match what
+  # the yarn.lock file specifies
+  check_and_install:
+    steps:
+      - run: yarn --check-files
+
+  setup:
+    steps:
+      - checkout
+      - restore_cache
+      - check_and_install
+
+  update_cache:
+    steps:
+      - setup
+      - save_cache

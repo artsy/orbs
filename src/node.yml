@@ -1,0 +1,8 @@
+version: 2.1
+description: Common execution environment for client-only javascript projects
+
+executors:
+  build:
+    description: "Used for projects that only use node as a build tool"
+    docker:
+      - image: circleci/node:8
