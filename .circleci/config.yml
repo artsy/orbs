@@ -6,7 +6,7 @@ executors:
       - image: circleci/circleci-cli
 
 jobs:
-  validateOrbs:
+  validate_orbs:
     executor: cli
     steps:
       run: "scripts/validate_orbs.sh"
@@ -15,4 +15,4 @@ workflows:
   version: 2
   validate:
     jobs:
-      - validateOrbs
+      - validate_orbs
