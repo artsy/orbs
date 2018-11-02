@@ -9,6 +9,7 @@ jobs:
   validate_orbs:
     executor: cli
     steps:
+      - checkout
       - run: "scripts/validate_orbs.sh"
 
 workflows:
