@@ -1,0 +1,17 @@
+version: 2.1
+
+executors:
+  cli:
+    docker:
+      - image: circleci/circleci-cli
+
+jobs:
+  validateOrbs:
+    steps:
+      run: "scripts/validate_orbs.sh"
+
+workflows:
+  version: 2
+  validate:
+    jobs:
+      - validateOrbs
