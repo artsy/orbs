@@ -3,7 +3,7 @@ description: Common yarn commands
 
 commands:
   # https://circleci.com/docs/2.0/caching/#basic-example-of-dependency-caching
-  save_cache:
+  save_dependencies:
     steps:
       - save_cache:
           key: yarn-deps-{{ checksum "yarn.lock" }}
@@ -15,7 +15,7 @@ commands:
   # hit, but it might be an older version of the cache
   #
   # https://circleci.com/docs/2.0/caching/#restoring-cache
-  restore_cache:
+  load_dependencies:
     steps:
       - restore_cache:
           keys:
@@ -34,10 +34,10 @@ commands:
   setup:
     steps:
       - checkout
-      - restore_cache
+      - load_dependencies
       - check_and_install
 
-  update_cache:
+  update_dependencies:
     steps:
       - setup
-      - save_cache
+      - save_dependencies
