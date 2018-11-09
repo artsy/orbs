@@ -1,4 +1,4 @@
-# Orb Version 0.0.1
+# Orb Version 0.0.2
 
 version: 2.1
 description: Common yarn commands
@@ -22,22 +22,21 @@ commands:
       - restore_cache:
           keys:
             - yarn-deps-{{ checksum "yarn.lock" }}
-            - yarn-deps-
 
   # By default when yarn runs it does not check the filesystem to ensure the
   # packages it expects to be installed are actually installed. Using the
   # --check-files flag ensures that any packages or files missing or out of date
   # on the file system (i.e. those which might be restored from cache) match what
   # the yarn.lock file specifies
-  check_and_install:
+  install:
     steps:
-      - run: yarn --check-files
+      - run: yarn
 
   setup:
     steps:
       - checkout
       - load_dependencies
-      - check_and_install
+      - install
 
   update_dependencies:
     steps:
