@@ -33,13 +33,18 @@ if [ -z $VERSION ] || [ ! "${VERSION_COMMENT:0:1}" == "#" ]; then
   exit 1
 fi
 
-echo "Ensuring orb is valid..."
-
-circleci orb validate $YML_PATH
 
 LAST_PUBLISHED=$(circleci orb info artsy/$ORB | grep -i latest | grep -o "$VERSION_REGEX")
 
 # TODO: Fail if $LAST_PUBLISHED > $VERSION
+if [ $VERSION == $LAST_PUBLISHED ]; then
+  echo "artsy/$ORB@$VERSION is the latest, skipping publish"
+  exit 0
+fi
+
+echo "Ensuring orb is valid..."
+circleci orb validate $YML_PATH
+
 echo "Trying to publish $VERSION, last known publish version $LAST_PUBLISHED"
 
 circleci orb publish $YML_PATH artsy/$ORB@$VERSION
