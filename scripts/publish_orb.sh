@@ -4,6 +4,11 @@ set -euo pipefail
 VERSION_REGEX="[0-9]\.[0-9]\.[0-9]"
 RED="\x1B[31m"
 
+TOKEN=""
+if [ ! -z "${CIRCLECI_API_KEY:-}" ]; then
+  TOKEN="--token $CIRCLECI_API_KEY"
+fi
+
 print() {
   reset="\x1B[0m"
   color=$1
@@ -47,4 +52,4 @@ circleci orb validate $YML_PATH
 
 echo "Trying to publish $VERSION, last known publish version $LAST_PUBLISHED"
 
-circleci orb publish $YML_PATH artsy/$ORB@$VERSION
+circleci orb publish $YML_PATH artsy/$ORB@$VERSION $TOKEN

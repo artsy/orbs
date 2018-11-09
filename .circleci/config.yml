@@ -22,10 +22,13 @@ workflows:
   build:
     jobs:
       - validate_orbs:
-          branches:
-            ignore:
-              - master
+          filters:
+            branches:
+              ignore:
+                - master
       - publish_orbs:
-          branches:
-            only:
-              - master
+          context: circleci-api
+          filters:
+            branches:
+              only:
+                - master
