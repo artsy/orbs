@@ -11,9 +11,24 @@ jobs:
     steps:
       - checkout
       - run: "scripts/validate_orbs.sh"
+  publish_orbs:
+    executor: cli
+    steps:
+      - checkout
+      - run: "scripts/publish_bumped_orbs.sh"
 
 workflows:
   version: 2
-  validate:
+  build:
     jobs:
-      - validate_orbs
+      - validate_orbs:
+          filters:
+            branches:
+              ignore:
+                - master
+      - publish_orbs:
+          context: circleci-api
+          filters:
+            branches:
+              only:
+                - master
