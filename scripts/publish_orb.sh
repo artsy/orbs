@@ -1,55 +1,44 @@
 #!/bin/bash
 set -euo pipefail
 
-VERSION_REGEX="[0-9]\.[0-9]\.[0-9]"
-RED="\x1B[31m"
+. ./scripts/orb_utils.sh
 
 TOKEN=""
 if [ ! -z "${CIRCLECI_API_KEY:-}" ]; then
   TOKEN="--token $CIRCLECI_API_KEY"
 fi
 
-print() {
-  reset="\x1B[0m"
-  color=$1
-  echo "$color$2$reset"
-}
-
 echo ""
-echo "Running publish for orb $1..."
+echo "Beginning publish of artsy/$1 orb"
 
 ORB="$1"
-YML_PATH="./src/$ORB/$ORB.yml"
+ORB_PATH=$(get_orb_path $ORB)
 
-if [ ! -f "$YML_PATH" ]; then
-  echo "No orb exists at $YML_PATH"
-  exit 1
-fi
+# Ensuring orb is valid
+./scripts/validate_orb.sh $ORB
 
-VERSION_COMMENT=$(head -n 1 $YML_PATH)
-VERSION=$(echo $VERSION_COMMENT | grep -o "$VERSION_REGEX")
-
-# Ensure the version is defined and that the version comment actually is a comment...
-if [ -z $VERSION ] || [ ! "${VERSION_COMMENT:0:1}" == "#" ]; then
-  echo ""
-  print $RED "Orb at $YML_PATH does not have a version comment"
-  print $RED "Add something like '# Orb Version 1.0.0' at the top of the file"
-  print $RED "That version will be used as the published version"
-  exit 1
-fi
-
-
+VERSION=$(get_orb_version $ORB)
 LAST_PUBLISHED=$(circleci orb info artsy/$ORB | grep -i latest | grep -o "$VERSION_REGEX")
 
-# TODO: Fail if $LAST_PUBLISHED > $VERSION
-if [ $VERSION == $LAST_PUBLISHED ]; then
-  echo "artsy/$ORB@$VERSION is the latest, skipping publish"
-  exit 0
-fi
-
-echo "Ensuring orb is valid..."
-circleci orb validate $YML_PATH
-
-echo "Trying to publish $VERSION, last known publish version $LAST_PUBLISHED"
+case $(compare_version $VERSION $LAST_PUBLISHED) in
+  "=")
+    echo "artsy/$ORB@$VERSION is the latest, skipping publish"
+    exit 0
+    ;;
+  "<")
+    echo "artsy/$ORB@$LAST_PUBLISHED is the latest, cannot publish older version $VERSION"
+    echo "Please update $ORB_PATH to have a version greater than $LAST_PUBLISHED"
+    exit 1
+    ;;
+  ">")
+    echo "Preparing to bump artsy/$ORB from $LAST_PUBLISHED to $VERSION"
+    ;;
+  *)
+    echo "Version comparison for artsy/$ORB failed."
+    echo "Current version: $VERSION"
+    echo "Published version: $LAST_PUBLISHED"
+    exit 1
+    ;;
+esac
 
 circleci orb publish $YML_PATH artsy/$ORB@$VERSION $TOKEN
