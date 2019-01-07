@@ -1,4 +1,4 @@
-# Orb Version 0.0.3
+# Orb Version 0.0.4
 
 version: 2.1
 description: Common yarn commands
@@ -55,6 +55,19 @@ commands:
       - setup
       - run: yarn << script >>
 
+  run-release:
+    parameters:
+      script:
+        type: string
+        default: yarn release
+    steps:
+      - add_ssh_keys
+      - setup
+      - run: git pull
+      # Setup the .npmrc with the proper registry and auth token to publish
+      - run: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
+      - run: << script >>
+
 jobs:
   run:
     executor: node/build
@@ -110,9 +123,21 @@ jobs:
   release:
     executor: node/build
     steps:
-      - add_ssh_keys
+      - run-release
+
+  auto-release:
+    executor: node/build
+    steps:
+      - run-release:
+          script: yarn auto shipit
+
+  auto-pr-check:
+    executor: node/build
+    steps:
       - setup
-      - run: git pull
-      # Setup the .npmrc with the proper registry and auth token to publish
-      - run: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
-      - run: yarn release
+      - run:
+          name: Check if PR has valid labels
+          command: |
+            if [ ! -z "$CIRCLE_PR_NUMBER" ]; then
+              yarn auto pr-check --pr $CIRCLE_PR_NUMBER --url $CIRCLE_PULL_REQUEST
+            fi
