@@ -12,13 +12,13 @@ echo ""
 echo "Beginning publish of artsy/$1 orb"
 
 ORB="$1"
-ORB_PATH=$(get_orb_path $ORB)
 
 # Ensuring orb is valid
 ./scripts/validate_orb.sh $ORB
 
+ORB_PATH=$(get_orb_path $ORB)
 VERSION=$(get_orb_version $ORB)
-LAST_PUBLISHED=$(circleci orb info artsy/$ORB | grep -i latest | grep -o "$VERSION_REGEX")
+LAST_PUBLISHED=$(get_published_orb_version $ORB)
 
 case $(compare_version $VERSION $LAST_PUBLISHED) in
   "=")

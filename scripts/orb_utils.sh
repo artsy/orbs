@@ -17,6 +17,11 @@ get_orb_version() {
   echo $VERSION
 }
 
+get_published_orb_version() {
+  LAST_PUBLISHED=$(circleci orb info artsy/$1 | grep -i latest | grep -o "$VERSION_REGEX")
+  echo $LAST_PUBLISHED
+}
+
 compare_version() {
   local GREATER=">"
   local LESS="<"
