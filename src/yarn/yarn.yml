@@ -1,4 +1,4 @@
-# Orb Version 0.0.4
+# Orb Version 0.0.5
 
 version: 2.1
 description: Common yarn commands
@@ -53,7 +53,7 @@ commands:
         type: string
     steps:
       - setup
-      - run: yarn << script >>
+      - run: yarn << parameters.script >>
 
   run-release:
     parameters:
@@ -66,7 +66,7 @@ commands:
       - run: git pull
       # Setup the .npmrc with the proper registry and auth token to publish
       - run: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
-      - run: << script >>
+      - run: << parameters.script >>
 
 jobs:
   run:
@@ -76,7 +76,7 @@ jobs:
         type: string
     steps:
       - run-script:
-          script: << script >>
+          script: << parameters.script >>
 
   lint:
     executor: node/build
