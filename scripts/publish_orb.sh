@@ -41,4 +41,4 @@ case $(compare_version $VERSION $LAST_PUBLISHED) in
     ;;
 esac
 
-# circleci orb publish $YML_PATH artsy/$ORB@$VERSION $TOKEN
+circleci orb publish $YML_PATH artsy/$ORB@$VERSION $TOKEN
