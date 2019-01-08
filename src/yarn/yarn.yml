@@ -141,5 +141,5 @@ jobs:
             if [ ! -z "$CIRCLE_PR_NUMBER" ]; then
               yarn auto pr-check --pr $CIRCLE_PR_NUMBER --url $CIRCLE_PULL_REQUEST
             elif
-              yarn auto pr-check --pr ${CIRCLE_PR_NUMBER##https:/*/} --url $CIRCLE_PULL_REQUEST
+              yarn auto pr-check --pr ${CIRCLE_PULL_REQUEST##https:/*/} --url $CIRCLE_PULL_REQUEST
             fi
