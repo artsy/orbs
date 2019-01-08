@@ -1,4 +1,4 @@
-# Orb Version 0.0.5
+# Orb Version 0.0.6
 
 version: 2.1
 description: Common yarn commands
@@ -140,4 +140,6 @@ jobs:
           command: |
             if [ ! -z "$CIRCLE_PR_NUMBER" ]; then
               yarn auto pr-check --pr $CIRCLE_PR_NUMBER --url $CIRCLE_PULL_REQUEST
+            elif
+              yarn auto pr-check --pr ${CIRCLE_PR_NUMBER##https:/*/} --url $CIRCLE_PULL_REQUEST
             fi
