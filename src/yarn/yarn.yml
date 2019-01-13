@@ -103,7 +103,7 @@ jobs:
       # workers Jest will spawn many memory hungry workers and ultimately
       # starve the job for memory.
       - run-script:
-          script: test -w 6
+          script: test -w 4
 
   update-cache:
     executor: node/build
