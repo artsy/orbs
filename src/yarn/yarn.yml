@@ -1,4 +1,4 @@
-# Orb Version 0.0.8
+# Orb Version 0.1.0
 
 version: 2.1
 description: Common yarn commands
@@ -129,7 +129,7 @@ jobs:
     executor: node/build
     steps:
       - run-release:
-          script: yarn auto shipit
+          script: npx --package auto-release-cli auto shipit
 
   auto-pr-check:
     executor: node/build
@@ -139,7 +139,7 @@ jobs:
           name: Check if PR has valid labels
           command: |
             if [ ! -z "$CIRCLE_PR_NUMBER" ]; then
-              yarn auto pr-check --pr $CIRCLE_PR_NUMBER --url $CIRCLE_PULL_REQUEST
+              npx --package auto-release-cli auto pr-check --pr $CIRCLE_PR_NUMBER --url $CIRCLE_PULL_REQUEST
             else
-              yarn auto pr-check --pr ${CIRCLE_PULL_REQUEST##https:/*/} --url $CIRCLE_PULL_REQUEST
+              npx --package auto-release-cli auto pr-check --pr ${CIRCLE_PULL_REQUEST##https:/*/} --url $CIRCLE_PULL_REQUEST
             fi
