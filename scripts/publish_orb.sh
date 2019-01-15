@@ -42,3 +42,10 @@ case $(compare_version $VERSION $LAST_PUBLISHED) in
 esac
 
 circleci orb publish $ORB_PATH artsy/$ORB@$VERSION $TOKEN
+
+./slack \
+  -color "good" \
+  -title "Circle CI $ORB orb v$VERSION published!" \
+  -title_link "${CIRCLE_BUILD_URL:-https://circleci.com/gh/artsy/orbs/tree/master}" \
+  -user_name "artsyit" \
+  -icon_emoji ":crystal_ball:"
