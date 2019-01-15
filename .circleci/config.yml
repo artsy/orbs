@@ -10,12 +10,22 @@ jobs:
     executor: cli
     steps:
       - checkout
-      - run: "scripts/validate_orbs.sh"
+      - run:
+          name: Validate orbs
+          command: scripts/validate_orbs.sh
   publish_orbs:
     executor: cli
     steps:
       - checkout
-      - run: "scripts/publish_orbs.sh"
+      - run:
+          name: Install slack notifier
+          command: |
+            curl --location --output ./slack \
+            https://github.com/cloudposse/slack-notifier/releases/download/0.2.0/slack-notifier_linux_amd64
+            chmod +x ./slack
+      - run:
+          name: Publish orbs
+          command: scripts/publish_orbs.sh
 
 workflows:
   version: 2
