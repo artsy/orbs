@@ -128,8 +128,9 @@ jobs:
   auto-release:
     executor: node/build
     steps:
+      - run: yarn global add auto
       - run-release:
-          script: npx auto shipit
+          script: auto shipit
 
   auto-pr-check:
     executor: node/build
