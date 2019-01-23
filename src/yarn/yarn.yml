@@ -1,4 +1,4 @@
-# Orb Version 0.1.1
+# Orb Version 0.1.2
 
 version: 2.1
 description: Common yarn commands
@@ -128,8 +128,9 @@ jobs:
   auto-release:
     executor: node/build
     steps:
+      - run: yarn global add auto
       - run-release:
-          script: npx auto shipit
+          script: auto shipit
 
   auto-pr-check:
     executor: node/build
