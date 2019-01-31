@@ -1,4 +1,4 @@
-# Orb Version 0.1.4
+# Orb Version 0.1.5
 
 version: 2.1
 description: Common yarn commands
@@ -98,12 +98,16 @@ jobs:
 
   test:
     executor: node/build
+    parameters:
+      args:
+        type: string
+        default: -w 4
     steps:
       # Runs jest tests with 6 concurrent workers. Without limiting it to 6
       # workers Jest will spawn many memory hungry workers and ultimately
       # starve the job for memory.
       - run-script:
-          script: test -w 4
+          script: test << parameters.args >>
 
   update-cache:
     executor: node/build
