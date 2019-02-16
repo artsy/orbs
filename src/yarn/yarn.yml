@@ -1,4 +1,4 @@
-# Orb Version 0.1.6
+# Orb Version 0.1.7
 
 version: 2.1
 description: Common yarn commands
@@ -38,6 +38,7 @@ commands:
 
   setup:
     steps:
+      - add_ssh_keys
       - checkout
       - load_dependencies
       - install
@@ -61,7 +62,6 @@ commands:
         type: string
         default: yarn release
     steps:
-      - add_ssh_keys
       - setup
       - run: git pull
       # Setup the .npmrc with the proper registry and auth token to publish
@@ -134,7 +134,7 @@ jobs:
     parameters:
       args:
         type: string
-        default: ''
+        default: ""
     steps:
       - run-release:
           script: npx auto shipit << parameters.args >>
