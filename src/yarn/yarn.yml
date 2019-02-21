@@ -1,4 +1,4 @@
-# Orb Version 0.1.7
+# Orb Version 0.1.8
 
 version: 2.1
 description: Common yarn commands
@@ -147,7 +147,7 @@ jobs:
           name: Check if PR has valid labels
           command: |
             if [ ! -z "$CIRCLE_PR_NUMBER" ]; then
-              npx --package auto-release-cli auto pr-check --pr $CIRCLE_PR_NUMBER --url $CIRCLE_PULL_REQUEST
+              npx auto pr-check --pr $CIRCLE_PR_NUMBER --url $CIRCLE_PULL_REQUEST
             else
-              npx --package auto-release-cli auto pr-check --pr ${CIRCLE_PULL_REQUEST##https:/*/} --url $CIRCLE_PULL_REQUEST
+              npx auto pr-check --pr ${CIRCLE_PULL_REQUEST##https:/*/} --url $CIRCLE_PULL_REQUEST
             fi
