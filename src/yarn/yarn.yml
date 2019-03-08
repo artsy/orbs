@@ -90,6 +90,12 @@ jobs:
       - run-script:
           script: relay
 
+  prettier-check:
+    executor: node/build
+    steps:
+      - run-script:
+          script: prettier-check
+
   type-check:
     executor: node/build
     steps:
