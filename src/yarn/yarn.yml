@@ -1,4 +1,4 @@
-# Orb Version 0.2.0
+# Orb Version 1.0.0
 
 version: 2.1
 description: Common yarn commands
@@ -98,21 +98,27 @@ jobs:
 
   test:
     executor: node/build
+    parameters:
+      args:
+        type: string
+        default: ""
+    steps:
+      - run-script:
+          script: test << parameters.args >>
+
+  jest:
+    executor: node/build
     environment:
       JEST_JUNIT_OUTPUT: "reports/junit/js-test-results.xml"
     parameters:
-      ci-stats:
-        type: boolean
-        default: false
       args:
         type: string
         default: -w 4
     steps:
-      # Runs jest tests with 6 concurrent workers. Without limiting it to 6
-      # workers Jest will spawn many memory hungry workers and ultimately
-      # starve the job for memory.
       - run-script:
-          script: test <<# parameters.ci-stats >>--reporters=default --reporters=jest-junit<</ parameters.ci-stats >> << parameters.args >>
+          script: jest --reporters=default --reporters=jest-junit << parameters.args >>
+      - store_test_results:
+          path: reports/junit/js-test-results.xml
 
   update-cache:
     executor: node/build
