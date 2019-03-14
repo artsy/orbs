@@ -1,4 +1,4 @@
-# Orb Version 0.1.9
+# Orb Version 0.2.0
 
 version: 2.1
 description: Common yarn commands
@@ -101,6 +101,9 @@ jobs:
     environment:
       JEST_JUNIT_OUTPUT: "reports/junit/js-test-results.xml"
     parameters:
+      ci-stats:
+        type: boolean
+        default: false
       args:
         type: string
         default: -w 4
@@ -109,7 +112,7 @@ jobs:
       # workers Jest will spawn many memory hungry workers and ultimately
       # starve the job for memory.
       - run-script:
-          script: test << parameters.args >>
+          script: test <<# parameters.ci-stats >>--reporters=default --reporters=jest-junit<</ parameters.ci-stats >> << parameters.args >>
 
   update-cache:
     executor: node/build
