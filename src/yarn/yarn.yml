@@ -1,4 +1,4 @@
-# Orb Version 1.0.1
+# Orb Version 1.1.0
 
 version: 2.1
 description: Common yarn commands
@@ -146,9 +146,10 @@ jobs:
       args:
         type: string
         default: ""
+        
     steps:
       - run-release:
-          script: npx auto shipit << parameters.args >>
+          script: npx auto shipit << parameters.args >> $AUTO_ARGS
 
   auto-pr-check:
     executor: node/build
