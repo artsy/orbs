@@ -146,7 +146,6 @@ jobs:
       args:
         type: string
         default: ""
-        
     steps:
       - run-release:
           script: npx auto shipit << parameters.args >> $AUTO_ARGS
