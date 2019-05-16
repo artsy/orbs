@@ -1,0 +1,77 @@
+# Orb Version 0.0.1
+
+version: 2.1
+description: Reusable hokusai tasks for managing deployments
+
+executors:
+  deploy:
+    docker:
+      - image: artsy/hokusai:0.5
+
+commands:
+  setup:
+    steps:
+      - add_ssh_keys
+      - checkout
+
+  setup-docker:
+    steps:
+      - setup
+      - setup_remote_docker
+
+jobs:
+  test:
+    executor: deploy
+    steps:
+      - setup-docker
+      - run:
+          name: Test
+          command: hokusai test
+  push:
+    executor: deploy
+    steps:
+      - setup-docker
+      - run:
+          name: Push
+          command: hokusai registry push --tag $CIRCLE_SHA1 --force --overwrite
+
+  deploy-staging:
+    executor: deploy
+    parameters:
+      project-name:
+        type: string
+        description: The name of the project as it appears on github
+    steps:
+      - setup
+      - run:
+          name: Configure
+          command: hokusai configure --kubectl-version 1.10.7 --s3-bucket artsy-citadel --s3-key k8s/config --platform linux
+      - run:
+          name: Validate Kubernetes Yaml
+          command: kubectl --context staging apply -f hokusai/staging.yml --dry-run
+      - run:
+          name: Deploy
+          command: hokusai staging deploy $CIRCLE_SHA1
+      - run:
+          name: Update Staging branch
+          command: git push git@github.com:artsy/<< parameters.project-name >>.git $CIRCLE_SHA1:refs/heads/staging --force
+
+  deploy-production:
+    executor: deploy
+    steps:
+      - setup
+      - run:
+          name: Configure
+          command: hokusai configure --kubectl-version 1.10.7 --s3-bucket artsy-citadel --s3-key k8s/config --platform linux
+      - run:
+          name: Validate Kubernetes Yaml
+          command: kubectl --context production apply -f hokusai/production.yml --dry-run
+      - run:
+          name: What's being deployed
+          command: hokusai pipeline gitcompare --org-name artsy
+      - run:
+          name: Changes with migrations
+          command: hokusai pipeline gitlog | grep migration || true
+      - run:
+          name: Deploy
+          command: hokusai pipeline promote --git-remote origin
