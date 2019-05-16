@@ -47,7 +47,7 @@ if [ ! -z "$IS_PUBLISHED" ]; then
 
 else
   echo "Orb artsy/$ORB isn't in the registry. Creating its registry entry..."
-  circleci orb create artsy/$ORB
+  circleci orb create artsy/$ORB $TOKEN
 fi
 
 circleci orb publish $ORB_PATH artsy/$ORB@$VERSION $TOKEN
