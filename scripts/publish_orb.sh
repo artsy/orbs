@@ -20,7 +20,7 @@ ORB_PATH=$(get_orb_path $ORB)
 VERSION=$(get_orb_version $ORB)
 IS_PUBLISHED=$(is_orb_published $ORB)
 
-if [ -z "$IS_PUBLISHED" ]; then
+if [ ! -z "$IS_PUBLISHED" ]; then
 
   LAST_PUBLISHED=$(get_published_orb_version $ORB)
 
