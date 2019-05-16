@@ -17,6 +17,13 @@ get_orb_version() {
   echo $VERSION
 }
 
+is_orb_published() {
+  PUBLISHED=$(circleci orb list artsy | grep artsy/$1)
+  if [ ! -z "$PUBLISHED" ]; then
+    echo "true"
+  fi
+}
+
 get_published_orb_version() {
   LAST_PUBLISHED=$(circleci orb info artsy/$1 | grep -i latest | grep -o "$VERSION_REGEX")
   echo $LAST_PUBLISHED
