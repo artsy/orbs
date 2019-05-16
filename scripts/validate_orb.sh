@@ -15,7 +15,7 @@ fi
 
 VERSION=$(get_orb_version $ORB)
 VERSION_COMMENT=$(head -n 1 $ORB_PATH)
-PUBLISHED_VERSION=$(get_published_orb_version $ORB)
+IS_PUBLISHED=$(is_orb_published $ORB)
 
 # Ensure the version is defined and that the version comment actually is a comment...
 if [ -z $VERSION ] || [ ! "${VERSION_COMMENT:0:1}" == "#" ]; then
@@ -26,21 +26,26 @@ if [ -z $VERSION ] || [ ! "${VERSION_COMMENT:0:1}" == "#" ]; then
   return
 fi
 
-BRANCH=$(git rev-parse --abbrev-ref HEAD)
-if [ "$BRANCH" != "master" ]; then
+if [ ! -z "$IS_PUBLISHED" ]; then
 
-  CHANGED_FILES=$(git diff --name-only HEAD..master)
-  UPDATED_FILES=$(git status -s | cut -c4-)
-  ALL_CHANGES=("${CHANGED_FILES[@]}" "${UPDATED_FILES[@]}")
-  for file in ${ALL_CHANGES[@]}; do
-    if [[ "$ORB_PATH" == *"$file" ]] && [[ "$VERSION" == "$PUBLISHED_VERSION" ]]; then
-      echo ""
-      echo "artsy/$ORB has been updated since master but hasn't had its version bumped."
-      echo "Update its version in $ORB_PATH"
-      exit 1
-    fi
-  done
+  PUBLISHED_VERSION=$(get_published_orb_version $ORB)
+  BRANCH=$(git rev-parse --abbrev-ref HEAD)
+  if [ "$BRANCH" != "master" ]; then
 
-fi 
+    CHANGED_FILES=$(git diff --name-only HEAD..master)
+    UPDATED_FILES=$(git status -s | cut -c4-)
+    ALL_CHANGES=("${CHANGED_FILES[@]}" "${UPDATED_FILES[@]}")
+    for file in ${ALL_CHANGES[@]}; do
+      if [[ "$ORB_PATH" == *"$file" ]] && [[ "$VERSION" == "$PUBLISHED_VERSION" ]]; then
+        echo ""
+        echo "artsy/$ORB has been updated since master but hasn't had its version bumped."
+        echo "Update its version in $ORB_PATH"
+        exit 1
+      fi
+    done
+
+  fi 
+
+fi
 
 circleci orb validate $ORB_PATH
