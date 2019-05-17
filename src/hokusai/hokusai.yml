@@ -1,4 +1,4 @@
-# Orb Version 0.0.1
+# Orb Version 0.1.0
 
 version: 2.1
 description: Reusable hokusai tasks for managing deployments
@@ -41,6 +41,10 @@ jobs:
       project-name:
         type: string
         description: The name of the project as it appears on github
+      time-out:
+        type: string
+        description: How long to wait for shell output before timing out
+        default: 20m
     steps:
       - setup
       - run:
@@ -52,12 +56,18 @@ jobs:
       - run:
           name: Deploy
           command: hokusai staging deploy $CIRCLE_SHA1
+          no_output_timeout: << parameters.time-out >>
       - run:
           name: Update Staging branch
           command: git push git@github.com:artsy/<< parameters.project-name >>.git $CIRCLE_SHA1:refs/heads/staging --force
 
   deploy-production:
     executor: deploy
+    parameters:
+      time-out:
+        type: string
+        description: How long to wait for shell output before timing out
+        default: 20m
     steps:
       - setup
       - run:
@@ -75,3 +85,4 @@ jobs:
       - run:
           name: Deploy
           command: hokusai pipeline promote --git-remote origin
+          no_output_timeout: << parameters.time-out >>
