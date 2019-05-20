@@ -148,7 +148,7 @@ jobs:
         default: ""
     steps:
       - run-release:
-          script: npx auto shipit << parameters.args >> $AUTO_ARGS
+          script: npx auto@6.5.1 shipit << parameters.args >> $AUTO_ARGS
 
   auto-pr-check:
     executor: node/build
