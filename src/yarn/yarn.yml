@@ -145,7 +145,7 @@ jobs:
     parameters:
       version:
         type: string
-        default: latest
+        default: 6.5.1
       args:
         type: string
         default: ""
