@@ -24,6 +24,10 @@ echo ""
 TOKEN=""
 if [ ! -z "${CIRCLECI_API_KEY:-}" ]; then
   TOKEN="--token $CIRCLECI_API_KEY"
+else
+  echo $(RED "Must provide CIRCLECI_API_KEY env var")
+  echo ""
+  exit 1
 fi
 
 
