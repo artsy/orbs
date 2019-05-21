@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if [ -z "$TERM" ] || [ "$TERM" = "dumb" ]; then
-  TERM="xterm-256color"
+  TERM="xterm"
 fi
 
 COLORS_ENABLED=$([ -x "$(command -v tput)" ] && echo "true")
