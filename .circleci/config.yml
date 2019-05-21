@@ -6,13 +6,6 @@ executors:
       - image: circleci/circleci-cli
 
 jobs:
-  validate_orbs:
-    executor: cli
-    steps:
-      - checkout
-      - run:
-          name: Validate orbs
-          command: scripts/validate_orbs.sh
   publish_orbs:
     executor: cli
     steps:
@@ -28,17 +21,7 @@ jobs:
           command: scripts/publish_orbs.sh
 
 workflows:
-  version: 2
   build:
     jobs:
-      - validate_orbs:
-          filters:
-            branches:
-              ignore:
-                - master
       - publish_orbs:
           context: circleci-api
-          filters:
-            branches:
-              only:
-                - master
