@@ -1,18 +1,19 @@
 #!/bin/bash
 
 if [ -z "$TERM" ] || [ "$TERM" = "dumb" ]; then
-  TERM="xterm"
+  _red="\e[31m"
+  _green="\e[32m"
+  _yellow="\e[33m"
+  _reset="\e[0m"
+else
+  _red=`tput -T $TERM setaf 1`
+  _green=`tput -T $TERM setaf 2`
+  _yellow=`tput -T $TERM setaf 3`
+  _reset=`tput -T $TERM sgr0`
 fi
 
-COLORS_ENABLED=$([ -x "$(command -v tput)" ] && echo "true")
-
-_red=`tput -T $TERM setaf 1`
-_green=`tput -T $TERM setaf 2`
-_yellow=`tput -T $TERM setaf 3`
-_reset=`tput -T $TERM sgr0`
-
 COLOR() {
-  [ ! -z COLORS_ENABLED ] && echo "$1$2${_reset}" || echo "$2"
+  echo "$1$2${_reset}"
 }
 
 RED() {
