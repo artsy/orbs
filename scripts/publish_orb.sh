@@ -14,9 +14,11 @@ set -euo pipefail
 . ./scripts/orb_utils.sh
 . ./scripts/colors.sh
 
+
 echo ""
 echo "Beginning publish of artsy/$1 orb"
 echo ""
+
 
 # Build CircleCI token argument
 TOKEN=""
@@ -24,8 +26,7 @@ if [ ! -z "${CIRCLECI_API_KEY:-}" ]; then
   TOKEN="--token $CIRCLECI_API_KEY"
 fi
 
-# Grab the current git branch
-BRANCH=$(git branch | grep \* | cut -d ' ' -f2)
+
 
 # Set a dry-run mode
 if [ ! -z "$DRY_RUN" ] || [ -z "$CI" ]; then
@@ -33,6 +34,9 @@ if [ ! -z "$DRY_RUN" ] || [ -z "$CI" ]; then
   echo $(YELLOW "[Running in dry-run mode]")
 fi 
 
+
+# Grab the current git branch
+BRANCH=$(git branch | grep \* | cut -d ' ' -f2)
 
 # Build the dev version prefix. When not on the master branch this will be
 # used to publish a dev version of the orb. That can be pulled in using
