@@ -143,12 +143,15 @@ jobs:
   auto-release:
     executor: node/build
     parameters:
+      version:
+        type: string
+        default: 6.5.1
       args:
         type: string
         default: ""
     steps:
       - run-release:
-          script: npx auto@6.5.1 shipit << parameters.args >> $AUTO_ARGS
+          script: npx auto@${AUTO_VERSION:-<< parameters.version >>} shipit << parameters.args >> $AUTO_ARGS
 
   auto-pr-check:
     executor: node/build
