@@ -88,7 +88,7 @@ else
   FULL_VERSION="$VERSION"
 fi
 
-# If the orb has been previously published (i.e. it already exists in cicle's registry)
+# If the orb has been previously published (i.e. it already exists in circle's registry)
 if [ ! -z "$IS_PUBLISHED" ]; then
 
   LAST_PUBLISHED=$(get_published_orb_version $ORB)
