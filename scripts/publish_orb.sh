@@ -20,21 +20,11 @@ echo "Beginning publish of artsy/$1 orb"
 echo ""
 
 
-# Build CircleCI token argument
-TOKEN=""
-if [ ! -z "${CIRCLECI_API_KEY:-}" ]; then
-  TOKEN="--token $CIRCLECI_API_KEY"
-else
-  echo $(RED "Must provide CIRCLECI_API_KEY env var")
-  echo ""
-  exit 1
-fi
-
-
-
-# Make sure DRY_RUN and CI are defined
+# Make sure used variables are defined
 DRY_RUN=${DRY_RUN:-""}
 CI=${CI:-""}
+CIRCLE_PULL_REQUEST=${CIRCLE_PULL_REQUEST:-""}
+CIRCLE_SHA1=${CIRCLE_SHA1:-$(git rev-parse HEAD)}
 
 # Set a dry-run mode
 if [ ! -z "$DRY_RUN" ] || [ -z "$CI" ]; then
@@ -45,6 +35,16 @@ else
 fi 
 
 
+# Build CircleCI token argument
+TOKEN=""
+if [ ! -z "${CIRCLECI_API_KEY:-}" ]; then
+  TOKEN="--token $CIRCLECI_API_KEY"
+elif [ -z "$DRY_RUN" ]; then
+  echo $(RED "Must provide CIRCLECI_API_KEY env var")
+  echo ""
+  exit 1
+fi
+
 # Grab the current git branch
 BRANCH=$(git branch | grep \* | cut -d ' ' -f2)
 
@@ -54,9 +54,17 @@ BRANCH=$(git branch | grep \* | cut -d ' ' -f2)
 #
 # This will be referred to as "dev mode" in later comments
 DEV=""
+VERSION_POSTFIX=""
 if [ "$BRANCH" != "master" ]; then
   DEV="dev:"
   echo $(YELLOW "[Running in dev mode]")
+
+  # Build the version postfix which should be unique per PR
+  VERSION_POSTFIX=${CIRCLE_PULL_REQUEST##https:/*/}
+  if [ -z "$VERSION_POSTFIX" ]; then
+    VERSION_POSTFIX="$CIRCLE_SHA1"
+  fi
+  VERSION_POSTFIX=".$VERSION_POSTFIX"
 fi
 
 # When in dev mode
@@ -64,7 +72,6 @@ if [ ! -z "$DEV" ]; then
   echo ""
   echo "This will be a dev deployment (prefixed with dev:)"
 fi
-
 
 ORB="$1"
 
@@ -74,6 +81,12 @@ ORB="$1"
 ORB_PATH=$(get_orb_path $ORB)
 VERSION=$(get_orb_version $ORB)
 IS_PUBLISHED=$(is_orb_published $ORB)
+
+if [ ! -z "$DEV" ]; then
+  FULL_VERSION="$DEV$VERSION$VERSION_POSTFIX"
+else
+  FULL_VERSION="$VERSION"
+fi
 
 # If the orb has been previously published (i.e. it already exists in cicle's registry)
 if [ ! -z "$IS_PUBLISHED" ]; then
@@ -109,21 +122,21 @@ if [ ! -z "$IS_PUBLISHED" ]; then
 
   # When in dev mode
   if [ ! -z "$DEV" ];then
-    echo "Preparing to publish dev orb artsy/$ORB@$DEV$VERSION"
+    echo "Preparing to publish dev orb artsy/$ORB@$FULL_VERSION"
   fi
 
 else
   echo "Orb artsy/$ORB isn't in the registry. Creating its registry entry..."
   circleci orb create artsy/$ORB $TOKEN --no-prompt
-  echo "Orb created, prepaing to publish artsy/$ORB@$DEV$VERSION"
+  echo "Orb created, prepaing to publish artsy/$ORB@$FULL_VERSION"
 fi
 
 
 # Publish to CircleCI (when it's not a dry run)
 if [ -z "$DRY_RUN" ]; then
-  circleci orb publish $ORB_PATH artsy/$ORB@$DEV$VERSION $TOKEN
+  circleci orb publish $ORB_PATH artsy/$ORB@$FULL_VERSION $TOKEN
 else
-  echo "$(YELLOW "[skipped]") circleci orb publish $ORB_PATH artsy/$ORB@$DEV$VERSION"
+  echo "$(YELLOW "[skipped]") circleci orb publish $ORB_PATH artsy/$ORB@$FULL_VERSION"
 fi
 
 
