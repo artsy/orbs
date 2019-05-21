@@ -1,15 +1,15 @@
 #!/bin/bash
 
 if [ -z "$TERM" ]; then
-  export TERM="vt100"
+  TERM="vt100"
 fi
 
 COLORS_ENABLED=$([ -x "$(command -v tput)" ] && echo "true")
 
-_red=`tput setaf 1`
-_red=`tput setaf 2`
-_yellow=`tput setaf 3`
-_reset=`tput sgr0`
+_red=`tput -T $TERM setaf 1`
+_red=`tput -T $TERM setaf 2`
+_yellow=`tput -T $TERM setaf 3`
+_reset=`tput -T $TERM sgr0`
 
 COLOR() {
   [ ! -z COLORS_ENABLED ] && echo "$1$2${_reset}" || echo "$2"
