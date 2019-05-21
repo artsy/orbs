@@ -1,13 +1,13 @@
 #!/bin/bash
 
-if [ -z "$TERM" ]; then
-  TERM="vt100"
+if [ -z "$TERM" ] || [ "$TERM" = "dumb" ]; then
+  TERM="xterm-256color"
 fi
 
 COLORS_ENABLED=$([ -x "$(command -v tput)" ] && echo "true")
 
 _red=`tput -T $TERM setaf 1`
-_red=`tput -T $TERM setaf 2`
+_green=`tput -T $TERM setaf 2`
 _yellow=`tput -T $TERM setaf 3`
 _reset=`tput -T $TERM sgr0`
 
