@@ -29,7 +29,7 @@ fi
 
 
 # Set a dry-run mode
-if [ ! -z "$DRY_RUN" ] || [ -z "$CI" ]; then
+if [ ! -z "${DRY_RUN:-}" ] || [ -z "${CI:-}" ]; then
   DRY_RUN="true"
   echo $(YELLOW "[Running in dry-run mode]")
 fi 
