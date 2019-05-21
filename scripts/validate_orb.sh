@@ -4,6 +4,7 @@ set -euo pipefail
 . ./scripts/orb_utils.sh
 
 ORB="$1"
+echo ""
 echo "Validating artsy/$1 orb"
 
 ORB_PATH=$(get_orb_path $ORB)
@@ -49,3 +50,5 @@ if [ ! -z "$IS_PUBLISHED" ]; then
 fi
 
 circleci orb validate $ORB_PATH
+
+echo ""

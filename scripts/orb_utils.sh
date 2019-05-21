@@ -18,8 +18,8 @@ get_orb_version() {
 }
 
 is_orb_published() {
-  PUBLISHED=$(circleci orb list artsy | grep artsy/$1)
-  if [ ! -z "$PUBLISHED" ]; then
+  PUBLISHED=$(circleci orb info artsy/$1 > /dev/null 2>&1; echo $?)
+  if [ "$PUBLISHED" -eq "0" ]; then
     echo "true"
   fi
 }
