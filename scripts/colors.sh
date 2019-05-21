@@ -13,7 +13,7 @@ else
 fi
 
 COLOR() {
-  echo "$1$2${_reset}"
+  echo -e "$1$2${_reset}"
 }
 
 RED() {
