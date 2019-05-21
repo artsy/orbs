@@ -1,5 +1,9 @@
 #!/bin/bash
 
+if [ -z "$TERM" ]; then
+  export TERM="vt100"
+fi
+
 COLORS_ENABLED=$([ -x "$(command -v tput)" ] && echo "true")
 
 _red=`tput setaf 1`
