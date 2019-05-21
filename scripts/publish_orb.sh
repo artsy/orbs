@@ -28,10 +28,16 @@ fi
 
 
 
+# Make sure DRY_RUN and CI are defined
+DRY_RUN=${DRY_RUN:-""}
+CI=${CI:-""}
+
 # Set a dry-run mode
-if [ ! -z "${DRY_RUN:-}" ] || [ -z "${CI:-}" ]; then
+if [ ! -z "$DRY_RUN" ] || [ -z "$CI" ]; then
   DRY_RUN="true"
   echo $(YELLOW "[Running in dry-run mode]")
+else
+  DRY_RUN=""
 fi 
 
 
