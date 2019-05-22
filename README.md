@@ -10,7 +10,7 @@ CircleCI 2.1 introduces [several new features](https://github.com/CircleCI-Publi
 
 For more info on Orbs, checkout their [docs](https://github.com/CircleCI-Public/config-preview-sdk/tree/master/docs)!
 
-The TL;DR is that an `orb` yml configuration file that's used to share things like [executors](orb-executors), [commands](orb-commands), and [jobs](orb-jobs) across your CircleCi builds.
+(The TL;DR is there's an `orb` yml configuration file that's used to share things like [executors](orb-executors), [commands](orb-commands), and [jobs](orb-jobs) across your CircleCi builds.)
 
 ## Getting Started
 
