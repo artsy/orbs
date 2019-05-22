@@ -14,7 +14,7 @@ For more info on Orbs, checkout their [docs](https://github.com/CircleCI-Public/
 
 ## Getting Started
 
-All our orbs are `.yml` files that are stored in `src/<orb-name>/<orb-name>.yml`. The nested directory is so that every orb can have associated documentation beside it.
+Orb files are stored in `src/<orb-name>/<orb-name>.yml`. The nested directory is so that every orb can have associated documentation beside it.
 
 ## Versioning
 
