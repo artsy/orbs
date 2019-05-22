@@ -18,7 +18,7 @@ Orb files are stored in `src/<orb-name>/<orb-name>.yml`. The nested directory is
 
 ## Versioning
 
-Every orb has a comment like `# Orb Version 1.2.3` on the first line of the file. This comment is significant in that it's used to determine which version of the orb should be deployed (which will be discussed in the next section). Every orb in master will have a comment representing the currently deployed production version.
+Every orb has a comment like `# Orb Version 1.2.3` on the first line of the file. This comment is significant in that it's used to determine which version of the orb should be deployed (which will be discussed in the next section). Orbs in `master` will have a comment representing the currently deployed production version.
 
 When you make a change to an orb file you _must_ update the version. CI checks will fail otherwise.
 
