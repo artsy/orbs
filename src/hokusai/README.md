@@ -1,6 +1,6 @@
 # artsy/hokusai
 
-This orb is built to share hokusai configuration across many CircleCI setups. It currently provides CirclCI workflow steps for `test`, `deploy-staging` and `deploy-production`, using a PR-based release process. Use the latest version of this orb in your app to ensure that hokusai and all related libs are up to date, and that deployments use the latest recommended workflow.
+This orb is built to share hokusai configuration across many CircleCI setups. It currently provides CircleCI workflow steps for `test`, `deploy-staging` and `deploy-production`, using a PR-based release process. Use the latest version of this orb in your app to ensure that hokusai and all related libs are up to date, and that deployments use the latest recommended workflow.
 
 Enabling orbs requires CircleCI 2.1, which is enabled for an app in 2 steps: 
 - In CircleCI UI > App "Build Settings" > "Advanced Settings", turn the "Enable pipelines" radio to `true`.
