@@ -1,12 +1,12 @@
 # Orb Version 0.1.0
 
-version: 2.1
+version: 2.2
 description: Reusable hokusai tasks for managing deployments
 
 executors:
   deploy:
     docker:
-      - image: artsy/hokusai:0.5
+      - image: artsy/hokusai:0.5.6
 
 commands:
   setup:
@@ -52,10 +52,10 @@ jobs:
           command: hokusai configure --kubectl-version 1.10.7 --s3-bucket artsy-citadel --s3-key k8s/config --platform linux
       - run:
           name: Validate Kubernetes Yaml
-          command: kubectl --context staging apply -f hokusai/staging.yml --dry-run
+          command: hokusai staging update --dry-run
       - run:
           name: Deploy
-          command: hokusai staging deploy $CIRCLE_SHA1
+          command: hokusai staging deploy $CIRCLE_SHA1 --update-config
           no_output_timeout: << parameters.time-out >>
       - run:
           name: Update Staging branch
@@ -75,7 +75,7 @@ jobs:
           command: hokusai configure --kubectl-version 1.10.7 --s3-bucket artsy-citadel --s3-key k8s/config --platform linux
       - run:
           name: Validate Kubernetes Yaml
-          command: kubectl --context production apply -f hokusai/production.yml --dry-run
+          command: hokusai production update --dry-run
       - run:
           name: What's being deployed
           command: hokusai pipeline gitcompare --org-name artsy
@@ -84,5 +84,5 @@ jobs:
           command: hokusai pipeline gitlog | grep migration || true
       - run:
           name: Deploy
-          command: hokusai pipeline promote --git-remote origin
+          command: hokusai production deploy staging --update-config
           no_output_timeout: << parameters.time-out >>
