@@ -1,4 +1,4 @@
-# Orb Version 0.2.0
+# Orb Version 0.3.0
 
 version: 2.1
 description: Reusable hokusai tasks for managing deployments
@@ -52,7 +52,7 @@ jobs:
           command: hokusai configure --kubectl-version 1.10.7 --s3-bucket artsy-citadel --s3-key k8s/config --platform linux
       - run:
           name: Validate Kubernetes Yaml
-          command: hokusai staging update --dry-run
+          command: hokusai staging update --skip-checks --dry-run
       - run:
           name: Deploy
           command: hokusai staging deploy $CIRCLE_SHA1 --update-config
@@ -75,7 +75,7 @@ jobs:
           command: hokusai configure --kubectl-version 1.10.7 --s3-bucket artsy-citadel --s3-key k8s/config --platform linux
       - run:
           name: Validate Kubernetes Yaml
-          command: hokusai production update --dry-run
+          command: hokusai production update --skip-checks --dry-run
       - run:
           name: What's being deployed
           command: hokusai pipeline gitcompare --org-name artsy
