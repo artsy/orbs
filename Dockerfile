@@ -1,2 +1,2 @@
 FROM circleci/circleci-cli
-ADD ./scripts scripts
+ADD ./scripts /orb-scripts

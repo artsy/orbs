@@ -9,17 +9,11 @@ executors:
       - image: artsy/orb-scripts
 
 commands:
-  publish:
+  setup-paths:
     steps:
       - run:
-          name: Publishing Orbs
-          command: scripts/publish_orbs.sh
-
-  validate:
-    steps:
-      - run:
-          name: Validating Orbs
-          command: scripts/validate_orbs.sh
+          name: Set orb scripts path
+          command: [ ! -d "./scripts" ] && ln -s /orb-scripts scripts
 
 jobs:
   publish:
@@ -30,6 +24,7 @@ jobs:
         type: string
     steps:
       - checkout
+      - setup-paths
       - run:
           name: Install slack notifier
           command: |
