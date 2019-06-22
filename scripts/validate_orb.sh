@@ -3,9 +3,11 @@ set -euo pipefail
 
 . ./scripts/orb_utils.sh
 
+check_for_namespace
+
 ORB="$1"
 echo ""
-echo "Validating artsy/$1 orb"
+echo "Validating $NAMESPACE/$1 orb"
 
 ORB_PATH=$(get_orb_path $ORB)
 
@@ -39,7 +41,7 @@ if [ ! -z "$IS_PUBLISHED" ]; then
     for file in ${ALL_CHANGES[@]}; do
       if [[ "$ORB_PATH" == *"$file" ]] && [[ "$VERSION" == "$PUBLISHED_VERSION" ]]; then
         echo ""
-        echo "artsy/$ORB has been updated since master but hasn't had its version bumped."
+        echo "$NAMESPACE/$ORB has been updated since master but hasn't had its version bumped."
         echo "Update its version in $ORB_PATH"
         exit 1
       fi

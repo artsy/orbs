@@ -2,6 +2,14 @@
 
 VERSION_REGEX="[0-9]\.[0-9]\.[0-9]"
 
+check_for_namespace() {
+  NAMESPACE=${NAMESPACE:-""}
+  if [ -z "$NAMESPACE" ]; then
+    echo "An env variable NAMESPACE must be provided that matches your CircleCI orb namespace"
+    exit 1
+  fi
+}
+
 get_orb_path() {
   local ORB="$1"
   local YML_PATH="./src/$ORB/$ORB.yml"
@@ -18,21 +26,24 @@ get_orb_version() {
 }
 
 is_orb_created() {
-  local CREATED=$(circleci orb list artsy | grep -w "artsy/$1")
+  check_for_namespace
+  local CREATED=$(circleci orb list $NAMESPACE | grep -w "$NAMESPACE/$1")
   if [ ! -z "$CREATED" ]; then
     echo "true"
   fi
 }
 
 is_orb_published() {
-  local PUBLISHED=$(circleci orb info artsy/$1 > /dev/null 2>&1; echo $?)
+  check_for_namespace
+  local PUBLISHED=$(circleci orb info $NAMESPACE/$1 > /dev/null 2>&1; echo $?)
   if [ "$PUBLISHED" -eq "0" ]; then
     echo "true"
   fi
 }
 
 get_published_orb_version() {
-  LAST_PUBLISHED=$(circleci orb info artsy/$1 | grep -i latest | grep -o "$VERSION_REGEX")
+  check_for_namespace
+  local LAST_PUBLISHED=$(circleci orb info $NAMESPACE/$1 | grep -i latest | grep -o "$VERSION_REGEX")
   echo $LAST_PUBLISHED
 }
 
