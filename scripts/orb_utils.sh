@@ -17,8 +17,15 @@ get_orb_version() {
   echo $VERSION
 }
 
+is_orb_created() {
+  local CREATED=$(circleci orb list artsy | grep -w "artsy/$1")
+  if [ ! -z "$CREATED" ]; then
+    echo "true"
+  fi
+}
+
 is_orb_published() {
-  PUBLISHED=$(circleci orb info artsy/$1 > /dev/null 2>&1; echo $?)
+  local PUBLISHED=$(circleci orb info artsy/$1 > /dev/null 2>&1; echo $?)
   if [ "$PUBLISHED" -eq "0" ]; then
     echo "true"
   fi
