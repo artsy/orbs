@@ -1,0 +1,37 @@
+# Orb Version 0.0.1
+
+version: 2.1
+description: A simple set of tools for managing orbs by Artsy
+
+executors:
+  orb-scripts:
+    docker:
+      - image: artsy/orb-scripts
+
+commands:
+  publish-orbs:
+    steps:
+      - run:
+          name: Publishing Orbs
+          command: scripts/publish_orbs.sh
+
+  validate-orbs:
+    steps:
+      - run:
+          name: Validating Orbs
+          command: scripts/validate_orbs.sh
+
+jobs:
+  publish_orbs:
+    executor: orb-scripts
+    steps:
+      - checkout
+      - run:
+          name: Install slack notifier
+          command: |
+            curl --location --output ./slack \
+            https://github.com/cloudposse/slack-notifier/releases/download/0.2.0/slack-notifier_linux_amd64
+            chmod +x ./slack
+      - run:
+          name: Publish orbs
+          command: scripts/publish_orbs.sh
