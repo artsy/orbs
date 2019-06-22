@@ -25,6 +25,7 @@ DRY_RUN=${DRY_RUN:-""}
 CI=${CI:-""}
 CIRCLE_PULL_REQUEST=${CIRCLE_PULL_REQUEST:-""}
 CIRCLE_SHA1=${CIRCLE_SHA1:-$(git rev-parse HEAD)}
+SLACK_WEBHOOK_URL=${SLACK_WEBHOOK_URL:-""}
 
 # Set a dry-run mode
 if [ ! -z "$DRY_RUN" ] || [ -z "$CI" ]; then
@@ -81,6 +82,7 @@ ORB="$1"
 ORB_PATH=$(get_orb_path $ORB)
 VERSION=$(get_orb_version $ORB)
 IS_PUBLISHED=$(is_orb_published $ORB)
+IS_CREATED=$(is_orb_created $ORB)
 
 if [ ! -z "$DEV" ]; then
   FULL_VERSION="$DEV$VERSION$VERSION_POSTFIX"
@@ -125,7 +127,7 @@ if [ ! -z "$IS_PUBLISHED" ]; then
     echo "Preparing to publish dev orb artsy/$ORB@$FULL_VERSION"
   fi
 
-else
+elif [ -z "$IS_CREATED" ]; then
   echo "Orb artsy/$ORB isn't in the registry. Creating its registry entry..."
   circleci orb create artsy/$ORB $TOKEN --no-prompt
   echo "Orb created, prepaing to publish artsy/$ORB@$FULL_VERSION"
@@ -141,7 +143,7 @@ fi
 
 
 # Publish to slack (when it's neither a dry run or dev mode)
-if [ -z "$DRY_RUN" ] && [ -z "$DEV" ]; then
+if [ -z "$DRY_RUN" ] && [ -z "$DEV" ] && [ ! -z "$SLACK_WEBHOOK_URL" ]; then
   ./slack \
     -color "good" \
     -title "Circle CI $ORB orb v$VERSION published!" \
@@ -149,7 +151,10 @@ if [ -z "$DRY_RUN" ] && [ -z "$DEV" ]; then
     -user_name "artsyit" \
     -icon_emoji ":crystal_ball:"
 
+elif [ -z "$SLACK_WEBHOOK_URL" ]; then
+  echo "$(YELLOW "[skipped]") Post to slack: No SLACK_WEBHOOK_URL environment variable set"
+
 # When it's a dry run but not in dev mode
 elif [ -z "$DRY_RUN" ]; then
-  echo "[skipped] Post to slack: Circle CI $ORB orb v$VERSION published"
+  echo "$(YELLOW "[skipped]") Post to slack: Circle CI $ORB orb v$VERSION published"
 fi
