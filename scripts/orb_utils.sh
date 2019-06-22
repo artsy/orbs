@@ -25,6 +25,18 @@ get_orb_version() {
   echo $VERSION
 }
 
+is_orb_changed() {
+    check_for_namespace
+
+    local ORB="$1"
+    local ORB_PATH="$(get_orb_path $ORB)"
+    local CHANGED="$(git diff --name-only master $ORB_PATH)"
+
+    if [ ! -z "$CHANGED" ]; then
+      echo "true"
+    fi
+}
+
 is_orb_created() {
   check_for_namespace
   local CREATED=$(circleci orb list $NAMESPACE | grep -w "$NAMESPACE/$1")

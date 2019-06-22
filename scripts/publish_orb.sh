@@ -16,8 +16,18 @@ set -euo pipefail
 
 check_for_namespace
 
+# Grab the current git branch
+BRANCH=$(git branch | grep \* | cut -d ' ' -f2)
+ORB="$1"
+IS_CHANGED=$(is_orb_changed $ORB)
+
+if [ "$BRANCH" != "master" ] && [ -z "$IS_CHANGED" ]; then
+  echo "$(YELLOW "[skipped]") Publish for $NAMESPACE/$ORB because there are no changes"
+  exit 0
+fi
+
 echo ""
-echo "Beginning publish of $NAMESPACE/$1 orb"
+echo "----- Begin publish of $NAMESPACE/$1 orb -----"
 echo ""
 
 
@@ -47,8 +57,6 @@ elif [ -z "$DRY_RUN" ]; then
   exit 1
 fi
 
-# Grab the current git branch
-BRANCH=$(git branch | grep \* | cut -d ' ' -f2)
 
 # Build the dev version prefix. When not on the master branch this will be
 # used to publish a dev version of the orb. That can be pulled in using
@@ -72,7 +80,6 @@ if [ ! -z "$DEV" ]; then
   echo "This will be a dev deployment (prefixed with dev:)"
 fi
 
-ORB="$1"
 
 # Ensure the orb is valid
 ./scripts/validate_orb.sh $ORB
@@ -120,25 +127,19 @@ if [ ! -z "$IS_PUBLISHED" ]; then
       ;;
   esac
 
-  # When in dev mode
-  if [ ! -z "$DEV" ];then
-    echo "Preparing to publish dev orb $NAMESPACE/$ORB@$FULL_VERSION"
-  fi
-
 elif [ -z "$IS_CREATED" ]; then
   echo "Orb $NAMESPACE/$ORB isn't in the registry. Creating its registry entry..."
   circleci orb create $NAMESPACE/$ORB $TOKEN --no-prompt
-  echo "Orb created, prepaing to publish $NAMESPACE/$ORB@$FULL_VERSION"
 fi
 
 
 # Publish to CircleCI (when it's not a dry run)
 if [ -z "$DRY_RUN" ]; then
+  echo "Preparing to publish dev orb $NAMESPACE/$ORB@$FULL_VERSION"
   circleci orb publish $ORB_PATH $NAMESPACE/$ORB@$FULL_VERSION $TOKEN
 else
   echo "$(YELLOW "[skipped]") circleci orb publish $ORB_PATH $NAMESPACE/$ORB@$FULL_VERSION"
 fi
-
 
 # Publish to slack (when it's neither a dry run or dev mode)
 if [ -z "$DRY_RUN" ] && [ -z "$DEV" ] && [ ! -z "$SLACK_WEBHOOK_URL" ]; then
@@ -156,3 +157,7 @@ elif [ -z "$SLACK_WEBHOOK_URL" ]; then
 elif [ -z "$DRY_RUN" ]; then
   echo "$(YELLOW "[skipped]") Post to slack: Circle CI $ORB orb v$VERSION published"
 fi
+
+echo ""
+echo "----- End publish of $NAMESPACE/$1 orb -----"
+echo ""
