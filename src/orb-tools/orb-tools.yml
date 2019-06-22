@@ -1,4 +1,4 @@
-# Orb Version 0.0.1
+# Orb Version 0.1.0
 
 version: 2.1
 description: A simple set of tools for managing orbs by Artsy
@@ -9,20 +9,20 @@ executors:
       - image: artsy/orb-scripts
 
 commands:
-  publish-orbs:
+  publish:
     steps:
       - run:
           name: Publishing Orbs
           command: scripts/publish_orbs.sh
 
-  validate-orbs:
+  validate:
     steps:
       - run:
           name: Validating Orbs
           command: scripts/validate_orbs.sh
 
 jobs:
-  publish_orbs:
+  publish:
     executor: orb-scripts
     steps:
       - checkout
