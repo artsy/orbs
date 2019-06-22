@@ -60,11 +60,8 @@ if [ "$BRANCH" != "master" ]; then
   DEV="dev:"
   echo $(YELLOW "[Running in dev mode]")
 
-  # Build the version postfix which should be unique per PR
-  VERSION_POSTFIX=${CIRCLE_PULL_REQUEST##https:/*/}
-  if [ -z "$VERSION_POSTFIX" ]; then
-    VERSION_POSTFIX="$CIRCLE_SHA1"
-  fi
+  # Build the version postfix which should be unique per branch
+  VERSION_POSTFIX="$(echo "$BRANCH" | md5sum | awk '{ print $1 }')"
   VERSION_POSTFIX=".$VERSION_POSTFIX"
 fi
 
