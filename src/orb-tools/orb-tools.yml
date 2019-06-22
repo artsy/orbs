@@ -1,4 +1,4 @@
-# Orb Version 0.1.0
+# Orb Version 0.2.0
 
 version: 2.1
 description: A simple set of tools for managing orbs by Artsy
@@ -24,6 +24,10 @@ commands:
 jobs:
   publish:
     executor: orb-scripts
+    parameters:
+      namespace:
+        description: CircleCI orb namespace
+        type: string
     steps:
       - checkout
       - run:
@@ -34,4 +38,4 @@ jobs:
             chmod +x ./slack
       - run:
           name: Publish orbs
-          command: scripts/publish_orbs.sh
+          command: NAMESPACE=<< parameters.namespace >> scripts/publish_orbs.sh

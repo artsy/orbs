@@ -18,7 +18,7 @@ jobs:
             chmod +x ./slack
       - run:
           name: Publish orbs
-          command: scripts/publish_orbs.sh
+          command: NAMESPACE=artsy scripts/publish_orbs.sh
 
 workflows:
   build:

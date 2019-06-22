@@ -14,9 +14,10 @@ set -euo pipefail
 . ./scripts/orb_utils.sh
 . ./scripts/colors.sh
 
+check_for_namespace
 
 echo ""
-echo "Beginning publish of artsy/$1 orb"
+echo "Beginning publish of $NAMESPACE/$1 orb"
 echo ""
 
 
@@ -51,7 +52,7 @@ BRANCH=$(git branch | grep \* | cut -d ' ' -f2)
 
 # Build the dev version prefix. When not on the master branch this will be
 # used to publish a dev version of the orb. That can be pulled in using
-# artsy/<orb-name>@dev:<version>. This is useful for testing purposes.
+# $NAMESPACE/<orb-name>@dev:<version>. This is useful for testing purposes.
 #
 # This will be referred to as "dev mode" in later comments
 DEV=""
@@ -96,23 +97,23 @@ if [ ! -z "$IS_PUBLISHED" ]; then
     "=")
       # When not in dev mode
       if [ -z "$DEV" ]; then
-        echo "artsy/$ORB@$VERSION is the latest, skipping publish"
+        echo "$NAMESPACE/$ORB@$VERSION is the latest, skipping publish"
         exit 0
       fi
       ;;
     "<")
-      echo $(RED "artsy/$ORB@$LAST_PUBLISHED is the latest, cannot publish older version $VERSION")
+      echo $(RED "$NAMESPACE/$ORB@$LAST_PUBLISHED is the latest, cannot publish older version $VERSION")
       echo $(RED "Please update $ORB_PATH to have a version greater than $LAST_PUBLISHED")
       exit 1
       ;;
     ">")
       # when not in dev mode
       if [ -z "$DEV" ]; then
-        echo "Preparing to bump artsy/$ORB from $LAST_PUBLISHED to $VERSION"
+        echo "Preparing to bump $NAMESPACE/$ORB from $LAST_PUBLISHED to $VERSION"
       fi
       ;;
     *)
-      echo $(RED "Version comparison for artsy/$ORB failed.")
+      echo $(RED "Version comparison for $NAMESPACE/$ORB failed.")
       echo $(RED "Current version: $VERSION")
       echo $(RED "Published version: $LAST_PUBLISHED")
       exit 1
@@ -121,21 +122,21 @@ if [ ! -z "$IS_PUBLISHED" ]; then
 
   # When in dev mode
   if [ ! -z "$DEV" ];then
-    echo "Preparing to publish dev orb artsy/$ORB@$FULL_VERSION"
+    echo "Preparing to publish dev orb $NAMESPACE/$ORB@$FULL_VERSION"
   fi
 
 elif [ -z "$IS_CREATED" ]; then
-  echo "Orb artsy/$ORB isn't in the registry. Creating its registry entry..."
-  circleci orb create artsy/$ORB $TOKEN --no-prompt
-  echo "Orb created, prepaing to publish artsy/$ORB@$FULL_VERSION"
+  echo "Orb $NAMESPACE/$ORB isn't in the registry. Creating its registry entry..."
+  circleci orb create $NAMESPACE/$ORB $TOKEN --no-prompt
+  echo "Orb created, prepaing to publish $NAMESPACE/$ORB@$FULL_VERSION"
 fi
 
 
 # Publish to CircleCI (when it's not a dry run)
 if [ -z "$DRY_RUN" ]; then
-  circleci orb publish $ORB_PATH artsy/$ORB@$FULL_VERSION $TOKEN
+  circleci orb publish $ORB_PATH $NAMESPACE/$ORB@$FULL_VERSION $TOKEN
 else
-  echo "$(YELLOW "[skipped]") circleci orb publish $ORB_PATH artsy/$ORB@$FULL_VERSION"
+  echo "$(YELLOW "[skipped]") circleci orb publish $ORB_PATH $NAMESPACE/$ORB@$FULL_VERSION"
 fi
 
 
@@ -144,7 +145,7 @@ if [ -z "$DRY_RUN" ] && [ -z "$DEV" ] && [ ! -z "$SLACK_WEBHOOK_URL" ]; then
   ./slack \
     -color "good" \
     -title "Circle CI $ORB orb v$VERSION published!" \
-    -title_link "${CIRCLE_BUILD_URL:-https://circleci.com/gh/artsy/orbs/tree/master}" \
+    -title_link "${CIRCLE_BUILD_URL:-https://circleci.com/gh/$NAMESPACE/orbs/tree/master}" \
     -user_name "artsyit" \
     -icon_emoji ":crystal_ball:"
 
