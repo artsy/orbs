@@ -1,4 +1,4 @@
-# Orb Version 0.2.1
+# Orb Version 0.2.2
 
 version: 2.1
 description: A simple set of tools for managing orbs by Artsy
@@ -15,7 +15,7 @@ commands:
           name: Set orb scripts path
           command: |
             if [ ! -d "./scripts" ]; then 
-              ln -s /orb-scripts scripts
+              ln -s /tmp/orb-scripts scripts
             fi
 
 jobs:
