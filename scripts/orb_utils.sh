@@ -30,7 +30,7 @@ is_orb_changed() {
 
     local ORB="$1"
     local ORB_PATH="$(get_orb_path $ORB)"
-    local CHANGED="$(git diff --name-only master $ORB_PATH)"
+    local CHANGED="$(git diff --name-only origin/master $ORB_PATH)"
 
     if [ ! -z "$CHANGED" ]; then
       echo "true"
