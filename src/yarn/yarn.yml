@@ -62,7 +62,9 @@ commands:
       - setup
       - run: git pull
       # Setup the .npmrc with the proper registry and auth token to publish
-      - run: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
+      - run:
+          name: Setup npmrc
+          command: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
 
   run-release:
     parameters:
