@@ -1,4 +1,4 @@
-# Orb Version 2.0.0
+# Orb Version 2.1.0
 
 version: 2.1
 description: Common yarn commands
@@ -6,6 +6,7 @@ description: Common yarn commands
 orbs:
   node: artsy/node@0.1.0
   queue: eddiewebb/queue@1.0.110
+  auto: auto/release@0.0.1
 
 commands:
   # https://circleci.com/docs/2.0/caching/#basic-example-of-dependency-caching
@@ -56,16 +57,20 @@ commands:
       - setup
       - run: yarn << parameters.script >>
 
+  pre-release:
+    steps:
+      - setup
+      - run: git pull
+      # Setup the .npmrc with the proper registry and auth token to publish
+      - run: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
+
   run-release:
     parameters:
       script:
         type: string
         default: yarn release
     steps:
-      - setup
-      - run: git pull
-      # Setup the .npmrc with the proper registry and auth token to publish
-      - run: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
+      - pre-release
       - run: << parameters.script >>
 
 jobs:
@@ -150,5 +155,5 @@ jobs:
         type: string
         default: ""
     steps:
-      - run-release:
-          script: npx auto@${AUTO_VERSION:-<< parameters.version >>} shipit << parameters.args >> $AUTO_ARGS
+      - pre-release
+      - auto/shipit
