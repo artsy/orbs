@@ -6,7 +6,7 @@ description: A simple set of tools for managing orbs by Artsy
 executors:
   orb-scripts:
     docker:
-      - image: artsy/orb-scripts@latest
+      - image: artsy/orb-scripts
 
 commands:
   setup-paths:
