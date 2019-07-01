@@ -6,7 +6,7 @@ description: Common yarn commands
 orbs:
   node: artsy/node@0.1.0
   queue: eddiewebb/queue@1.0.110
-  auto: auto/release@0.0.1
+  auto: auto/release@0.0.2
 
 commands:
   # https://circleci.com/docs/2.0/caching/#basic-example-of-dependency-caching
