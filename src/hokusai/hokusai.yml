@@ -48,8 +48,11 @@ jobs:
     steps:
       - setup
       - run:
+          name: Install AWS IAM Authenticator
+          command: curl -o aws-iam-authenticator https://amazon-eks.s3-us-west-2.amazonaws.com/1.13.7/2019-06-11/bin/linux/amd64/aws-iam-authenticator && chmod +x ./aws-iam-authenticator && mv aws-iam-authenticator /usr/local/bin/
+      - run:
           name: Configure
-          command: hokusai configure --kubectl-version 1.10.7 --s3-bucket artsy-citadel --s3-key k8s/config --platform linux
+          command: hokusai configure --kubectl-version 1.10.7 --s3-bucket artsy-citadel --s3-key k8s/config-ci --platform linux
       - run:
           name: Validate Kubernetes Yaml
           command: hokusai staging update --skip-checks --dry-run
@@ -71,8 +74,11 @@ jobs:
     steps:
       - setup
       - run:
+          name: Install AWS IAM Authenticator
+          command: curl -o aws-iam-authenticator https://amazon-eks.s3-us-west-2.amazonaws.com/1.13.7/2019-06-11/bin/linux/amd64/aws-iam-authenticator && chmod +x ./aws-iam-authenticator && mv aws-iam-authenticator /usr/local/bin/
+      - run:
           name: Configure
-          command: hokusai configure --kubectl-version 1.10.7 --s3-bucket artsy-citadel --s3-key k8s/config --platform linux
+          command: hokusai configure --kubectl-version 1.10.7 --s3-bucket artsy-citadel --s3-key k8s/config-ci --platform linux
       - run:
           name: Validate Kubernetes Yaml
           command: hokusai production update --skip-checks --dry-run
