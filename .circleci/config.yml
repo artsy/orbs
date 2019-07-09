@@ -6,6 +6,14 @@ executors:
       - image: circleci/circleci-cli
 
 jobs:
+  validate_orbs:
+    executor: cli
+    steps:
+      - checkout
+      - run:
+          name: Validate orbs
+          command: NAMESPACE=artsy scripts/validate_orbs.sh
+
   publish_orbs:
     executor: cli
     steps:
@@ -23,5 +31,8 @@ jobs:
 workflows:
   build:
     jobs:
+      - validate_orbs
       - publish_orbs:
           context: circleci-api
+          requires:
+            - validate_orbs
