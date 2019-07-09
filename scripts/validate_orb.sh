@@ -36,7 +36,7 @@ if [ ! -z "$IS_CREATED" ] && [ ! -z "$IS_PUBLISHED" ]; then
   BRANCH=$(git rev-parse --abbrev-ref HEAD)
   if [ "$BRANCH" != "master" ]; then
 
-    CHANGED_FILES=$(git diff --name-only HEAD..master)
+    CHANGED_FILES=$(git diff --name-only HEAD..origin/master)
     UPDATED_FILES=$(git status -s | cut -c4-)
     ALL_CHANGES=("${CHANGED_FILES[@]}" "${UPDATED_FILES[@]}")
     for file in ${ALL_CHANGES[@]}; do
