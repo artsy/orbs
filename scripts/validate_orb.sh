@@ -19,6 +19,7 @@ fi
 VERSION=$(get_orb_version $ORB)
 VERSION_COMMENT=$(head -n 1 $ORB_PATH)
 IS_PUBLISHED=$(is_orb_published $ORB)
+IS_CREATED=$(is_orb_created $ORB)
 
 # Ensure the version is defined and that the version comment actually is a comment...
 if [ -z $VERSION ] || [ ! "${VERSION_COMMENT:0:1}" == "#" ]; then
@@ -29,7 +30,7 @@ if [ -z $VERSION ] || [ ! "${VERSION_COMMENT:0:1}" == "#" ]; then
   return
 fi
 
-if [ ! -z "$IS_PUBLISHED" ]; then
+if [ ! -z "$IS_CREATED" ] && [ ! -z "$IS_PUBLISHED" ]; then
 
   PUBLISHED_VERSION=$(get_published_orb_version $ORB)
   BRANCH=$(git rev-parse --abbrev-ref HEAD)
