@@ -80,14 +80,13 @@ if [ ! -z "$DEV" ]; then
   echo "This will be a dev deployment (prefixed with dev:)"
 fi
 
-
-# Ensure the orb is valid
-./scripts/validate_orb.sh $ORB
-
 ORB_PATH=$(get_orb_path $ORB)
 VERSION=$(get_orb_version $ORB)
 IS_PUBLISHED=$(is_orb_published $ORB)
 IS_CREATED=$(is_orb_created $ORB)
+
+# Ensure the orb is valid
+circleci orb validate $ORB_PATH
 
 if [ ! -z "$DEV" ]; then
   FULL_VERSION="$DEV$VERSION_POSTFIX"
