@@ -25,10 +25,12 @@ commands:
         type: string
         default: "https://github.com/kubernetes-sigs/aws-iam-authenticator/releases/download/v0.4.0/aws-iam-authenticator_0.4.0_linux_amd64"
     steps:
-      - run: |
-        curl -L -o aws-iam-authenticator << parameters.uri >>
-        chmod +x ./aws-iam-authenticator
-        mv aws-iam-authenticator /usr/local/bin/
+      - run:
+          name: Install AWS IAM Authenticator
+          command: |
+            curl -L -o aws-iam-authenticator << parameters.uri >>
+            chmod +x ./aws-iam-authenticator
+            mv aws-iam-authenticator /usr/local/bin/
 
   configure-hokusai:
     parameters:
@@ -36,10 +38,12 @@ commands:
         type: string
         default: "https://artsy-provisioning-public.s3.amazonaws.com/hokusai/config-ci.yml"
     steps:
-      - run: |
-        mkdir -p ~/.hokusai
-        curl -o ~/.hokusai/config.yml << parameters.configUri >>
-        hokusai configure
+      - run:
+          name: Configure Hokusai
+          command: |
+            mkdir -p ~/.hokusai
+            curl -o ~/.hokusai/config.yml << parameters.configUri >>
+            hokusai configure
 
 
 jobs:
