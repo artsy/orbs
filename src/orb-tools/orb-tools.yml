@@ -19,6 +19,18 @@ commands:
             fi
 
 jobs:
+  validate:
+    executor: orb-scripts
+    parameters:
+      namespace:
+        description: CircleCI orb namespace
+        type: string
+    steps:
+      - checkout
+      - setup-paths
+      - run:
+          name: Validate orbs
+          command: NAMESPACE=<< parameters.namespace >> scripts/validate_orbs.sh
   publish:
     executor: orb-scripts
     parameters:
