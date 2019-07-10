@@ -31,8 +31,10 @@ jobs:
 workflows:
   build:
     jobs:
-      - validate_orbs
+      - validate_orbs:
+          filters:
+            branches:
+              ignore:
+                - master
       - publish_orbs:
           context: circleci-api
-          requires:
-            - validate_orbs
