@@ -1,4 +1,4 @@
-# Orb Version 0.3.0
+# Orb Version 0.4.0
 
 version: 2.1
 description: Reusable hokusai tasks for managing deployments
@@ -18,6 +18,33 @@ commands:
     steps:
       - setup
       - setup_remote_docker
+
+  install-aws-iam-authenticator:
+    parameters:
+      uri:
+        type: string
+        default: "https://github.com/kubernetes-sigs/aws-iam-authenticator/releases/download/v0.4.0/aws-iam-authenticator_0.4.0_linux_amd64"
+    steps:
+      - run:
+          name: Install AWS IAM Authenticator
+          command: |
+            curl -L -o aws-iam-authenticator << parameters.uri >>
+            chmod +x ./aws-iam-authenticator
+            mv aws-iam-authenticator /usr/local/bin/
+
+  configure-hokusai:
+    parameters:
+      configUri:
+        type: string
+        default: "https://artsy-provisioning-public.s3.amazonaws.com/hokusai/config-ci.yml"
+    steps:
+      - run:
+          name: Configure Hokusai
+          command: |
+            mkdir -p ~/.hokusai
+            curl -o ~/.hokusai/config.yml << parameters.configUri >>
+            hokusai configure
+
 
 jobs:
   test:
@@ -47,9 +74,8 @@ jobs:
         default: 20m
     steps:
       - setup
-      - run:
-          name: Configure
-          command: hokusai configure --kubectl-version 1.10.7 --s3-bucket artsy-citadel --s3-key k8s/config --platform linux
+      - install-aws-iam-authenticator
+      - configure-hokusai
       - run:
           name: Validate Kubernetes Yaml
           command: hokusai staging update --skip-checks --dry-run
@@ -70,9 +96,8 @@ jobs:
         default: 20m
     steps:
       - setup
-      - run:
-          name: Configure
-          command: hokusai configure --kubectl-version 1.10.7 --s3-bucket artsy-citadel --s3-key k8s/config --platform linux
+      - install-aws-iam-authenticator
+      - configure-hokusai
       - run:
           name: Validate Kubernetes Yaml
           command: hokusai production update --skip-checks --dry-run
@@ -84,5 +109,5 @@ jobs:
           command: hokusai pipeline gitlog | grep migration || true
       - run:
           name: Deploy
-          command: hokusai production deploy staging --update-config
+          command: hokusai pipeline promote --update-config
           no_output_timeout: << parameters.time-out >>
