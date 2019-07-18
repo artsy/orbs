@@ -45,6 +45,12 @@ commands:
             curl -o ~/.hokusai/config.yml << parameters.configUri >>
             hokusai configure
 
+  push-image:
+    steps:
+      - setup-docker
+      - run:
+          name: Push
+          command: hokusai registry push --tag $CIRCLE_SHA1 --force --overwrite
 
 jobs:
   test:
@@ -57,10 +63,7 @@ jobs:
   push:
     executor: deploy
     steps:
-      - setup-docker
-      - run:
-          name: Push
-          command: hokusai registry push --tag $CIRCLE_SHA1 --force --overwrite
+      - push-image
 
   deploy-staging:
     executor: deploy
