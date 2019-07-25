@@ -1,4 +1,4 @@
-# Orb Version 0.5.0
+# Orb Version 0.6.0
 
 version: 2.1
 description: Reusable hokusai tasks for managing deployments
@@ -55,11 +55,16 @@ commands:
 jobs:
   test:
     executor: deploy
+    parameters:
+      filename:
+        type: string
+        default: ./hokusai/test.yml
+        description: The docker-compose yaml file to use
     steps:
       - setup-docker
       - run:
           name: Test
-          command: hokusai test
+          command: hokusai test << parameters.ar
   push:
     executor: deploy
     steps:
