@@ -64,7 +64,7 @@ jobs:
       - setup-docker
       - run:
           name: Test
-          command: hokusai test << parameters.ar
+          command: hokusai test -f << parameters.filename >>
   push:
     executor: deploy
     steps:
