@@ -111,7 +111,7 @@ jobs:
           command: hokusai production update --skip-checks --dry-run
       - run:
           name: What's being deployed
-          command: hokusai pipeline gitcompare --org-name artsy
+          command: hokusai pipeline gitcompare --org-name artsy || true
       - run:
           name: Changes with migrations
           command: hokusai pipeline gitlog | grep migration || true
