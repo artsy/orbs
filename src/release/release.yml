@@ -1,0 +1,29 @@
+# Orb Version 0.0.1
+
+version: 2.1
+description: Wrapper for Artsy's release management tools
+
+executors:
+  scripts:
+    docker:
+      - image: artsy/orb-scripts
+
+jobs:
+  block:
+    executor: scripts
+    parameters:
+      project_id:
+        type: integer
+        description: The primary key of the project object in horizon
+    steps:
+      - run:
+          description:
+          command: |
+            RESULT=$(curl -s -f -u ${HORIZON_USER}:${HORIZON_PASS} "https://releases.artsy.net/api/deploy_blocks?project_id=<< parameters.project_id >>&resolved=false")
+            if [ "$RESULT" == "[]" ]; then
+              exit 0
+            else
+              echo "Deployment currently blocked, check https://releases.artsy.net"
+              echo "$RESULT" | jq
+              exit 5
+            fi
