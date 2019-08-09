@@ -17,7 +17,7 @@ jobs:
         description: The primary key of the project object in horizon
     steps:
       - run:
-          description:
+          description: Check horizon to see if there's an unresolved deployment block
           command: |
             RESULT=$(curl -s -f -u ${HORIZON_USER}:${HORIZON_PASS} "https://releases.artsy.net/api/deploy_blocks?project_id=<< parameters.project_id >>&resolved=false")
             if [ "$RESULT" == "[]" ]; then
