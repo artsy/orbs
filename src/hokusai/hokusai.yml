@@ -50,7 +50,12 @@ commands:
       - setup-docker
       - run:
           name: Push
-          command: hokusai registry push --tag $CIRCLE_SHA1 --force --overwrite
+          command: |
+            if hokusai registry images --limit 1000 | grep -q $CIRCLE_SHA1; then
+              echo "Skipping push as the tag $CIRCLE_SHA1 already exists in the Docker registry"
+            else
+              hokusai registry push --tag $CIRCLE_SHA1
+            fi
 
 jobs:
   test:
