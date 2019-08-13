@@ -9,6 +9,13 @@ orbs:
 
 commands:
   setup-artsy-remote-docker:
+    parameters:
+      artsy_docker_host:
+        type: string
+      artsy_docker_port:
+        type: integer
+      artsy_s3_path_root:
+        type: string
     steps:
       - run:
           name: Setup Artsy Remote Docker Connection
@@ -16,11 +23,11 @@ commands:
             if [[ -n "$AWS_ACCESS_KEY_ID" && -n "$AWS_SECRET_ACCESS_KEY" ]]; then
               printf "Setting up remote docker connection...\n"
               mkdir ~/.docker
-              aws s3 cp s3://artsy-citadel/docker/ca.pem ~/.docker/ca.pem
-              aws s3 cp s3://artsy-citadel/docker/cert.pem ~/.docker/cert.pem
-              aws s3 cp s3://artsy-citadel/docker/key.pem ~/.docker/key.pem
+              aws s3 cp s3://<< parameters.artsy_s3_path_root >>/ca.pem ~/.docker/ca.pem
+              aws s3 cp s3://<< parameters.artsy_s3_path_root >>/cert.pem ~/.docker/cert.pem
+              aws s3 cp s3://<< parameters.artsy_s3_path_root >>/key.pem ~/.docker/key.pem
 
-              echo 'export DOCKER_HOST="tcp://docker.artsy.net:2376"' >> "$BASH_ENV"
+              echo 'export DOCKER_HOST="tcp://<< parameters.artsy_docker_host >>:<< parameters.artsy_docker_port >>"' >> "$BASH_ENV"
               echo 'export DOCKER_TLS_VERIFY="1"' >> "$BASH_ENV"
               source "$BASH_ENV"
 
@@ -83,10 +90,23 @@ commands:
 jobs:
   build:
     executor: hokusai/deploy
+    parameters:
+      artsy_docker_host:
+        type: string
+        default: docker.artsy.net
+      artsy_docker_port:
+        type: integer
+        default: 2376
+      artsy_s3_path_root:
+        type: string
+        default: artsy-citadel/docker
     steps:
       - add_ssh_keys
       - checkout
-      - setup-artsy-remote-docker
+      - setup-artsy-remote-docker:
+          artsy_docker_host: << parameters.artsy_docker_host >>
+          artsy_docker_port: << parameters.artsy_docker_port >>
+          artsy_s3_path_root: << parameters.artsy_s3_path_root >>
       - build-image-via-artsy
       - setup_remote_docker
       - build-image-via-circle
