@@ -1,0 +1,92 @@
+# Orb Version 0.1.0
+
+version: 2.1
+description: >
+  Excute Docker build via Artsy-managed Docker daemon with a Circle CI fallback
+
+orbs:
+  hokusai: artsy/hokusai@0.7.0
+
+commands:
+  setup-artsy-remote-docker:
+    steps:
+      - run:
+          name: Setup Artsy Remote Docker Connection
+          command: |
+            if [[ -n "$AWS_ACCESS_KEY_ID" && -n "$AWS_SECRET_ACCESS_KEY" ]]; then
+              printf "Setting up remote docker connection...\n"
+              mkdir ~/.docker
+              aws s3 cp s3://artsy-citadel/docker/ca.pem ~/.docker/ca.pem
+              aws s3 cp s3://artsy-citadel/docker/cert.pem ~/.docker/cert.pem
+              aws s3 cp s3://artsy-citadel/docker/key.pem ~/.docker/key.pem
+
+              echo 'export DOCKER_HOST="tcp://docker.artsy.net:2376"' >> "$BASH_ENV"
+              echo 'export DOCKER_TLS_VERIFY="1"' >> "$BASH_ENV"
+              source "$BASH_ENV"
+
+              printf "Checking remote docker connection...\n"
+              if docker ps --last 1 --quiet; then
+                printf "Remote docker connection established.\n"
+              else
+                printf "Remote docker daemon unavailable. Reverting back to Circle CI docker.\n"
+                rm $BASH_ENV
+                exit 0
+              fi
+            else
+              printf "Required environment variables `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` unavailable. Exiting.\n"
+              exit 1
+            fi
+
+  build-image-via-artsy:
+    steps:
+      - run:
+          name: Build & Push via Artsy Remote Docker Connection
+          no_output_timeout: 15m
+          command: |
+            if test -f "$BASH_ENV"; then
+              source $BASH_ENV
+
+              printf "Building image...\n"
+              BUILD_TAG="$CIRCLE_SHA1" hokusai build
+
+              printf "Pushing image...\n"
+              hokusai registry push \
+                --no-build \
+                --local-tag="$CIRCLE_SHA1" \
+                --tag="$CIRCLE_SHA1" \
+                --overwrite \
+                --skip-latest
+
+              printf "Skipping local docker build fallback...\n"
+              circleci step halt
+            else
+              printf "Remote docker build unavailable. Reverting back to Circle CI docker.\n"
+            fi
+
+  build-image-via-circle:
+    steps:
+      - run:
+          name: Build & Push via Circle CI Fallback
+          no_output_timeout: 15m
+          command: |
+            printf "Building image...\n"
+            BUILD_TAG="$CIRCLE_SHA1" hokusai build
+
+            printf "Pushing image...\n"
+            hokusai registry push \
+              --no-build \
+              --local-tag="$CIRCLE_SHA1" \
+              --tag="$CIRCLE_SHA1" \
+              --overwrite \
+              --skip-latest
+
+jobs:
+  build:
+    executor: hokusai/deploy
+    steps:
+      - add_ssh_keys
+      - checkout
+      - setup-artsy-remote-docker
+      - build-image-via-artsy
+      - setup_remote_docker
+      - build-image-via-circle
