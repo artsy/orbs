@@ -1,0 +1,84 @@
+# Orb Version 0.1.1
+
+version: 2.1
+description: 'Use to skip CI when PR title contains "[wip]", "[skip ci]", "[ci skip]" or is draft'
+
+commands:
+  check-skippable-pr:
+    steps:
+      - run: apk add --no-cache bash curl jq
+      - run:
+          shell: /bin/bash
+          name: Check Skippable PR
+          command: |
+            required_env_vars=(
+              "GITHUB_TOKEN"
+              "CIRCLE_PROJECT_USERNAME"
+              "CIRCLE_PR_REPONAME"
+              "CIRCLE_PR_NUMBER"
+              "CIRCLE_TOKEN"
+              "CIRCLE_BUILD_NUM"
+            )
+
+            for required_env_var in ${required_env_vars[@]}; do
+              if [[ -z "${!required_env_var}" ]]; then
+                printf "${required_env_var} not provided, but that doesn't mean we should skip CI.\n"
+                exit 0
+              fi
+            done
+
+            # Since we're piggybacking off of an existing OAuth var, tweak the var for our uses
+            token=$(printf "${GITHUB_TOKEN}" | cut -d':' -f1)
+
+            headers="Authorization: token $token"
+            api_endpoint="https://api.github.com/repos/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PR_REPONAME}/pulls/${CIRCLE_PR_NUMBER}"
+
+            # Fetch PR metadata from Github's API and parse fields from json
+            github_res=$(curl --silent --header "${headers}" "${api_endpoint}" | jq '{mergeable_state: .mergeable_state, title: .title}')
+            mergeable_state=$(printf "${github_res}" | jq '.mergeable_state')
+            title=$(printf "${github_res}" | jq '.title' | tr '[:upper:]' '[:lower:]')
+            echo "${title}"
+
+            if [[ "${title}" == "null" && "${mergeable_state}" == "null" ]]; then
+              printf "Couldn't fetch info on PR, but that doesn't mean we should skip CI.\n"
+              exit 0
+            fi
+
+            cancel_running_jobs=0
+
+            if [[ "${mergeable_state}" == "\"draft\"" ]]; then
+              printf "PR is a draft, skipping CI!\n"
+              cancel_running_jobs=1
+            fi
+
+            for skip_token in '[skip ci]' '[ci skip]' '[wip]'; do
+              if [[ ${title} == *"${skip_token}"* ]]; then
+                printf "Found \"${skip_token}\" in PR title, skipping CI!\n"
+                cancel_running_jobs=1
+              fi
+            done
+
+            if [[ "${cancel_running_jobs}" == 1 ]]; then
+              CIRCLE_API_BASE_URL="https://circleci.com/api/v1.1/project/github/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}"
+              AUTH_PARAMS="circle-token=${CIRCLE_TOKEN}"
+              SELF_BUILD_NUM="${CIRCLE_BUILD_NUM}"
+
+              all_jobs=$(curl -s -S "$CIRCLE_API_BASE_URL/tree/$CIRCLE_BRANCH?$AUTH_PARAMS")
+
+              running_jobs=$(echo $all_jobs | jq "map(if .status == \"running\" or .status == \"not_running\"  then .build_num else \"None\" end) - [${SELF_BUILD_NUM}] - [\"None\"] | .[]")
+
+              for buildNum in $running_jobs; do
+                echo Canceling "$buildNum"
+                curl -s -S -X POST "$CIRCLE_API_BASE_URL/$buildNum/cancel?$AUTH_PARAMS" > /dev/null
+              done
+
+            fi
+
+            exit 0
+
+jobs:
+  check-skippable-pr:
+    docker:
+      - image: alpine:3.7
+    steps:
+      - check-skippable-pr
