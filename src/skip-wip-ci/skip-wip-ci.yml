@@ -1,4 +1,4 @@
-# Orb Version 0.1.1
+# Orb Version 0.2.0
 
 version: 2.1
 description: 'Use to skip CI when PR title contains "[wip]", "[skip ci]", "[ci skip]" or is draft'
