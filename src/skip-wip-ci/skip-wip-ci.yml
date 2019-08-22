@@ -59,7 +59,7 @@ commands:
             done
 
             if [[ "${cancel_running_jobs}" == 1 ]]; then
-              printf "Attempting to cancel any running jobs"
+              printf "Attempting to cancel any running jobs\n"
               CIRCLE_API_BASE_URL="https://circleci.com/api/v1.1/project/github/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}"
               AUTH_PARAMS="circle-token=${CIRCLE_TOKEN}"
               SELF_BUILD_NUM="${CIRCLE_BUILD_NUM}"
@@ -69,11 +69,11 @@ commands:
               running_jobs=$(echo "${all_jobs}" | jq "map(if .status == \"running\" or .status == \"not_running\"  then .build_num else \"None\" end) - [${SELF_BUILD_NUM}] - [\"None\"] | .[]")
 
               for buildNum in $running_jobs; do
-                printf "Canceling ${buildNum}"
+                printf "Canceling ${buildNum}\n"
                 curl --silent --show-error --request POST "${CIRCLE_API_BASE_URL}/${buildNum}/cancel?${AUTH_PARAMS}" > /dev/null
               done
             else
-              printf "No reason to skip CI, let's go!"
+              printf "No reason to skip CI, let's go!\n"
             fi
 
             exit 0
@@ -118,7 +118,7 @@ commands:
             done
 
             if [[ "${cancel_running_jobs}" == 1 ]]; then
-              printf "Attempting to cancel any running jobs"
+              printf "Attempting to cancel any running jobs\n"
               CIRCLE_API_BASE_URL="https://circleci.com/api/v1.1/project/github/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}"
               AUTH_PARAMS="circle-token=${CIRCLE_TOKEN}"
               SELF_BUILD_NUM="${CIRCLE_BUILD_NUM}"
@@ -128,11 +128,11 @@ commands:
               running_jobs=$(echo "${all_jobs}" | jq "map(if .status == \"running\" or .status == \"not_running\"  then .build_num else \"None\" end) - [${SELF_BUILD_NUM}] - [\"None\"] | .[]")
 
               for buildNum in $running_jobs; do
-                printf "Canceling ${buildNum}"
+                printf "Canceling ${buildNum}\n"
                 curl --silent --show-error --request POST "${CIRCLE_API_BASE_URL}/${buildNum}/cancel?${AUTH_PARAMS}" > /dev/null
               done
             else
-              printf "No reason to skip CI, let's go!"
+              printf "No reason to skip CI, let's go!\n"
             fi
 
             exit 0
