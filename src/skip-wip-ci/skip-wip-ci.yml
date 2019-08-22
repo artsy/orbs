@@ -1,4 +1,4 @@
-# Orb Version 0.2.0
+# Orb Version 0.3.0
 
 version: 2.1
 description: 'Use to skip CI when PR title contains "[wip]", "[skip ci]", "[ci skip]" or is draft'
@@ -80,15 +80,17 @@ commands:
 
   check-skippable-commit:
     steps:
-      - checkout
-      - run: apk add --no-cache bash curl git jq
+      - run: apk add --no-cache bash curl jq
       - run:
           shell: /bin/bash
           name: Check skippable commit
           command: |
 
             required_env_vars=(
+              "GITHUB_TOKEN"
               "CIRCLE_PROJECT_USERNAME"
+              "CIRCLE_PR_REPONAME"
+              "CIRCLE_SHA1"
               "CIRCLE_TOKEN"
               "CIRCLE_BUILD_NUM"
             )
@@ -100,7 +102,13 @@ commands:
               fi
             done
 
-            last_commit_message=$(git log -1 --pretty=%B)
+            token=$(printf "${GITHUB_TOKEN}" | cut -d':' -f1)
+
+            headers="Authorization: token $token"
+            api_endpoint="https://api.github.com/repos/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PR_REPONAME}/git/commits/${CIRCLE_SHA1}"
+
+            # Fetch last commit message from github using git SHA
+            last_commit_message=$(curl --silent --header "${headers}" "${api_endpoint}" | jq '.message')
 
             for skip_token in '[skip ci]' '[ci skip]' '[wip]'; do
               if [[ ${last_commit_message} == *"${skip_token}"* ]]; then
