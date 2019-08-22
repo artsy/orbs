@@ -1,10 +1,10 @@
 # artsy/skip-wip-ci
 
-This node contains shared commands and jobs that hit Github's API and skips draft PRs or PRs with "\[wip\]", "\[skip ci\]", or "\[ci skip\]" in title.
+This node contains shared commands and jobs that hit Github's API and skips draft PRs or PRs with "\[wip\]", "\[skip ci\]", or "\[ci skip\]" in title or commit message
 
 ## Usage example
 
-To use the `check-skippable-pr` job
+To use the `check-skippable-ci` job
 
 ```yaml
 # In your project's .circleci/config.yml
@@ -18,7 +18,7 @@ orbs:
 workflows:
   default:
     jobs:
-      - skip-wip-ci/check-skippable-pr
+      - skip-wip-ci/check-skippable-ci
       - test:
           <<: *not_staging_release
 ```
