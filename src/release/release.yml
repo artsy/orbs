@@ -1,0 +1,42 @@
+# Orb Version 0.0.1
+
+version: 2.1
+description: Wrapper for Artsy's release management tools
+
+executors:
+  scripts:
+    docker:
+      - image: artsy/orb-scripts
+
+jobs:
+  block:
+    executor: scripts
+    parameters:
+      project_id:
+        type: integer
+        description: The primary key of the project object in horizon
+    steps:
+      - run:
+          name: Check for deploy blocks
+          description: Check horizon to see if there's an unresolved deployment block
+          command: |
+            set -eo pipefail
+
+            RESULT=$(curl --max-time 5 -s -f -u ${HORIZON_USER}:${HORIZON_PASS} "https://releases.artsy.net/api/deploy_blocks?project_id=${TEST_DEPLOY_BLOCK_PROJECT_ID:-<< parameters.project_id >>}&resolved=false")
+            if [ "$RESULT" == "[]" ]; then
+              exit 0
+            else
+              echo "Deployment currently blocked, check https://releases.artsy.net"
+              echo "$RESULT" | jq
+              exit 5
+            fi
+
+# Below is used to test this orb. Just uncomment the workflows setting and run the following command
+
+# circleci config process src/release/release.yml > test.yml && circleci local execute --job block -c ./test.yml -e HORIZON_USER=artsy -e HORIZON_PASS=artxscience -e TEST_DEPLOY_BLOCK_PROJECT_ID=8
+
+# workflows:
+#   test:
+#     jobs:
+#       - block:
+#           project_id: -1
