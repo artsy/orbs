@@ -1,4 +1,4 @@
-# Orb Version 0.6.0
+# Orb Version 0.7.0
 
 version: 2.1
 description: Reusable hokusai tasks for managing deployments
@@ -23,7 +23,7 @@ commands:
     parameters:
       uri:
         type: string
-        default: "https://github.com/kubernetes-sigs/aws-iam-authenticator/releases/download/v0.4.0/aws-iam-authenticator_0.4.0_linux_amd64"
+        default: "https://artsy-provisioning-public.s3.amazonaws.com/aws-iam-authenticator_0.4.0_linux_amd64"
     steps:
       - run:
           name: Install AWS IAM Authenticator
@@ -50,7 +50,12 @@ commands:
       - setup-docker
       - run:
           name: Push
-          command: hokusai registry push --tag $CIRCLE_SHA1 --force --overwrite
+          command: |
+            if hokusai registry images --limit 1000 | grep -q $CIRCLE_SHA1; then
+              echo "Skipping push as the tag $CIRCLE_SHA1 already exists in the Docker registry"
+            else
+              hokusai registry push --tag $CIRCLE_SHA1
+            fi
 
 jobs:
   test:
@@ -111,7 +116,7 @@ jobs:
           command: hokusai production update --skip-checks --dry-run
       - run:
           name: What's being deployed
-          command: hokusai pipeline gitcompare --org-name artsy
+          command: hokusai pipeline gitcompare --org-name artsy || true
       - run:
           name: Changes with migrations
           command: hokusai pipeline gitlog | grep migration || true
