@@ -17,6 +17,7 @@ jobs:
         description: The primary key of the project object in horizon
     steps:
       - run:
+          name: Check for deploy blocks
           description: Check horizon to see if there's an unresolved deployment block
           command: |
             set -eo pipefail
