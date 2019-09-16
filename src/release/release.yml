@@ -33,7 +33,7 @@ jobs:
 
 # Below is used to test this orb. Just uncomment the workflows setting and run the following command
 
-# circleci config process src/release/release.yml > test.yml && circleci local execute --job block -c ./test.yml -e HORIZON_USER=artsy -e HORIZON_PASS=artxscience -e TEST_DEPLOY_BLOCK_PROJECT_ID=8
+# circleci config process src/release/release.yml > test.yml && circleci local execute --job block -c ./test.yml -e HORIZON_USER=<USER> -e HORIZON_PASS=<PASS> -e TEST_DEPLOY_BLOCK_PROJECT_ID=8
 
 # workflows:
 #   test:
