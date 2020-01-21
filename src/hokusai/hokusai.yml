@@ -1,4 +1,4 @@
-# Orb Version 0.7.0
+# Orb Version 0.7.1
 
 version: 2.1
 description: Reusable hokusai tasks for managing deployments
@@ -57,9 +57,7 @@ commands:
               hokusai registry push --tag $CIRCLE_SHA1
             fi
 
-jobs:
-  test:
-    executor: deploy
+  run-tests:
     parameters:
       filename:
         type: string
@@ -70,6 +68,19 @@ jobs:
       - run:
           name: Test
           command: hokusai test -f << parameters.filename >>
+
+jobs:
+  test:
+    executor: deploy
+    parameters:
+      filename:
+        type: string
+        default: ./hokusai/test.yml
+        description: The docker-compose yaml file to use
+    steps:
+      - setup-docker
+      - run-tests
+
   push:
     executor: deploy
     steps:
