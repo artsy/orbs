@@ -1,4 +1,4 @@
-# Orb Version 0.1.0
+# Orb Version 0.1.1
 
 version: 2.1
 description: >
@@ -40,8 +40,8 @@ commands:
                 exit 0
               fi
             else
-              printf "Required environment variables `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` unavailable. Exiting.\n"
-              exit 1
+              printf "Required environment variables `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` unavailable. Reverting back to Circle CI docker.\n"
+              exit 0
             fi
 
   build-image-via-artsy:
