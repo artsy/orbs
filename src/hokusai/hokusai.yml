@@ -68,7 +68,6 @@ commands:
         default: ""
         description: Optional hokusai flags
     steps:
-      - setup-docker
       - run:
           name: Test
           command: hokusai test -f << parameters.filename >> << parameters.flags >>
@@ -86,6 +85,7 @@ jobs:
         default: ""
         description: Optional hokusai flags
     steps:
+      - setup-docker
       - run-tests:
           filename: << parameters.filename >>
           flags: << parameters.filename >>
