@@ -39,4 +39,4 @@ jobs:
         default: ""
     steps:
       - yarn/pre-release
-      - auto/shipit
+      - auto/canary
