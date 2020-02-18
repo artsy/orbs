@@ -1,4 +1,4 @@
-# Orb Version 3.0.0
+# Orb Version 4.0.0
 
 version: 2.1
 description: Common yarn commands
@@ -6,7 +6,6 @@ description: Common yarn commands
 orbs:
   node: artsy/node@0.1.0
   queue: eddiewebb/queue@1.0.110
-  auto: auto/release@0.0.5
 
 commands:
   # https://circleci.com/docs/2.0/caching/#basic-example-of-dependency-caching
@@ -146,18 +145,3 @@ jobs:
     executor: node/build
     steps:
       - run-release
-
-  auto-release:
-    executor: node/build
-    environment:
-      AUTO_VERSION: v9.10.5
-    parameters:
-      version:
-        type: string
-        default: v9.10.5
-      args:
-        type: string
-        default: ""
-    steps:
-      - pre-release
-      - auto/shipit

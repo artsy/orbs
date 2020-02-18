@@ -1,0 +1,40 @@
+# Orb Version 1.0.0
+
+version: 2.1
+description: An orb for working w/ intuit's auto
+
+orbs:
+  yarn: artsy/yarn@4.0.0
+  node: artsy/node@0.1.0
+  auto: auto/release@0.1.0
+
+jobs:
+  publish:
+    executor: node/build
+    environment:
+      AUTO_VERSION: v9.10.5
+    parameters:
+      version:
+        type: string
+        default: v9.10.5
+      args:
+        type: string
+        default: ""
+    steps:
+      - yarn/pre-release
+      - auto/shipit
+
+  publish-canary:
+    executor: node/build
+    environment:
+      AUTO_VERSION: v9.10.5
+    parameters:
+      version:
+        type: string
+        default: v9.10.5
+      args:
+        type: string
+        default: ""
+    steps:
+      - yarn/pre-release
+      - auto/shipit
