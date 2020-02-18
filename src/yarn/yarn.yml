@@ -59,7 +59,6 @@ commands:
   pre-release:
     steps:
       - setup
-      - run: git pull
       # Setup the .npmrc with the proper registry and auth token to publish
       - run:
           name: Setup npmrc
