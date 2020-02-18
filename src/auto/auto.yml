@@ -4,7 +4,7 @@ version: 2.1
 description: An orb for working w/ intuit's auto
 
 orbs:
-  yarn: artsy/yarn@3.0.0
+  yarn: artsy/yarn@dev:94201cf9cd41b8b0d7441b5095ea044d
   node: artsy/node@0.1.0
   auto: auto/release@0.1.0
 
