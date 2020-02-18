@@ -1,4 +1,4 @@
-# Orb Version 2.1.1
+# Orb Version 3.0.0
 
 version: 2.1
 description: Common yarn commands
@@ -150,11 +150,11 @@ jobs:
   auto-release:
     executor: node/build
     environment:
-      AUTO_VERSION: v7.6.0
+      AUTO_VERSION: v9.10.5
     parameters:
       version:
         type: string
-        default: 6.5.1
+        default: v9.10.5
       args:
         type: string
         default: ""
