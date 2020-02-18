@@ -10,7 +10,7 @@ orbs:
 
 jobs:
   # Publishes a package to NPM
-  package:
+  publish:
     executor: node/build
     environment:
       AUTO_VERSION: v9.10.5
@@ -26,7 +26,7 @@ jobs:
       - auto/shipit
 
   # Publishes a canary package to npm
-  canary:
+  publish-canary:
     executor: node/build
     environment:
       AUTO_VERSION: v9.10.5
