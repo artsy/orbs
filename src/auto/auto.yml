@@ -4,12 +4,13 @@ version: 2.1
 description: An orb for working w/ intuit's auto
 
 orbs:
-  yarn: artsy/yarn@4.0.0
+  yarn: artsy/yarn@3.0.0
   node: artsy/node@0.1.0
   auto: auto/release@0.1.0
 
 jobs:
-  publish:
+  # Publishes a package to NPM
+  package:
     executor: node/build
     environment:
       AUTO_VERSION: v9.10.5
@@ -24,7 +25,8 @@ jobs:
       - yarn/pre-release
       - auto/shipit
 
-  publish-canary:
+  # Publishes a canary package to npm
+  canary:
     executor: node/build
     environment:
       AUTO_VERSION: v9.10.5
