@@ -1,0 +1,42 @@
+# Orb Version 1.0.1
+
+version: 2.1
+description: Publish NPM packages and canary deployments with Intuit's Auto
+
+orbs:
+  yarn: artsy/yarn@4.0.0
+  node: artsy/node@0.1.0
+  auto: auto/release@0.1.0
+
+jobs:
+  # Publishes a package to NPM
+  publish:
+    executor: node/build
+    environment:
+      AUTO_VERSION: v9.10.5
+    parameters:
+      version:
+        type: string
+        default: v9.10.5
+      args:
+        type: string
+        default: ""
+    steps:
+      - yarn/pre-release
+      - auto/shipit
+
+  # Publishes a canary package to npm
+  publish-canary:
+    executor: node/build
+    environment:
+      AUTO_VERSION: v9.10.5
+    parameters:
+      version:
+        type: string
+        default: v9.10.5
+      args:
+        type: string
+        default: ""
+    steps:
+      - yarn/pre-release
+      - auto/canary
