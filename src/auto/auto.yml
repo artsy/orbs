@@ -1,7 +1,7 @@
 # Orb Version 1.0.0
 
 version: 2.1
-description: An orb for working w/ intuit's auto
+description: Publish NPM packages and canary deployments with Intuit's Auto
 
 orbs:
   yarn: artsy/yarn@dev:94201cf9cd41b8b0d7441b5095ea044d
