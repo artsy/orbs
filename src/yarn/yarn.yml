@@ -125,7 +125,7 @@ jobs:
     steps:
       - run-script:
           script: |
-            important_files_not_modified() {
+            important_files_modified() {
               FILES="yarn.lock << parameters.important_files >>"
               for file in ${FILES[@]}; do
                 if ! git diff -s --exit-code $file; then
@@ -135,7 +135,7 @@ jobs:
               return 0
             }
 
-            if [[ "$(git rev-parse --abbrev-ref HEAD)" == "master" ]] && important_files_not_modified; then
+            if [[ "$(git rev-parse --abbrev-ref HEAD)" == "master" ]] || important_files_modified; then
               jest --coverage --reporters=default --reporters=jest-junit << parameters.args >>
             else
               jest --coverage --changeSince=master --reporters=default --reporters=jest-junit << parameters.args >>
