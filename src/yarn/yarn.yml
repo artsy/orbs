@@ -1,4 +1,4 @@
-# Orb Version 4.0.0
+# Orb Version 4.1.0
 
 version: 2.1
 description: Common yarn commands
@@ -119,9 +119,27 @@ jobs:
       args:
         type: string
         default: -w 4
+      important_files:
+        type: string
+        default: ""
     steps:
       - run-script:
-          script: jest --reporters=default --reporters=jest-junit << parameters.args >>
+          script: |
+            important_files_not_modified() {
+              FILES="yarn.lock << parameters.important_files >>"
+              for file in ${FILES[@]}; do
+                if ! git diff -s --exit-code $file; then
+                  return 1
+                fi
+              done
+              return 0
+            }
+
+            if [[ "$(git rev-parse --abbrev-ref HEAD)" == "master" ]] && important_files_not_modified; then
+              jest --coverage --reporters=default --reporters=jest-junit << parameters.args >>
+            else
+              jest --coverage --changeSince=master --reporters=default --reporters=jest-junit << parameters.args >>
+            fi
       - store_test_results:
           path: reports
 
