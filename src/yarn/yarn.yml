@@ -130,7 +130,7 @@ jobs:
             important_files_modified() {
               FILES="yarn.lock << parameters.important_files >>"
               for file in ${FILES[@]}; do
-                if ! git diff -s --exit-code $file; then
+                if ! git diff origin/master -s --exit-code $file; then
                   return 0
                 fi
               done
