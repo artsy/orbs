@@ -140,7 +140,7 @@ jobs:
             if [[ "$(git rev-parse --abbrev-ref HEAD)" == "master" ]] || important_files_modified; then
               yarn jest --coverage --reporters=default --reporters=jest-junit << parameters.args >>
             else
-              yarn jest --coverage --changedSince=master --reporters=default --reporters=jest-junit << parameters.args >>
+              yarn jest --coverage --changedSince=origin/master --reporters=default --reporters=jest-junit << parameters.args >>
             fi
       - store_test_results:
           path: reports
