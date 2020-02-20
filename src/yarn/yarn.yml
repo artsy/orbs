@@ -131,10 +131,10 @@ jobs:
               FILES="yarn.lock << parameters.important_files >>"
               for file in ${FILES[@]}; do
                 if ! git diff -s --exit-code $file; then
-                  return 1
+                  return 0
                 fi
               done
-              return 0
+              return 1
             }
 
             if [[ "$(git rev-parse --abbrev-ref HEAD)" == "master" ]] || important_files_modified; then
