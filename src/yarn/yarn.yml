@@ -1,4 +1,4 @@
-# Orb Version 4.0.0
+# Orb Version 4.0.1
 
 version: 2.1
 description: Common yarn commands
@@ -114,7 +114,7 @@ jobs:
   jest:
     executor: node/build
     environment:
-      JEST_JUNIT_OUTPUT: "reports/jest/results.xml"
+      JEST_JUNIT_OUTPUT_DIR: "reports/junit/js-test-results.xml"
     parameters:
       args:
         type: string
