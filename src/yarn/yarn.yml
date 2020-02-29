@@ -122,6 +122,10 @@ jobs:
       important_files:
         type: string
         default: ""
+      parallelism:
+        type: integer
+        default: 1
+    parallelism: << parameters.parallelism >>
     steps:
       - setup
       - run:
