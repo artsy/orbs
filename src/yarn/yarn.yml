@@ -122,30 +122,38 @@ jobs:
       important_files:
         type: string
         default: ""
-      parallelism:
-        type: integer
-        default: 1
-    parallelism: << parameters.parallelism >>
+      quick_check:
+        type: boolean
+        default: false
     steps:
       - setup
-      - run:
-          name: jest
-          command: |
-            important_files_modified() {
-              FILES="yarn.lock << parameters.important_files >>"
-              for file in ${FILES[@]}; do
-                if ! git diff origin/master -s --exit-code $file; then
-                  return 0
-                fi
-              done
-              return 1
-            }
+      - when:
+          condition: << parameters.quick_check >>
+          steps:
+            - run:
+                name: jest
+                command: |
+                  important_files_modified() {
+                    FILES="yarn.lock << parameters.important_files >>"
+                    for file in ${FILES[@]}; do
+                      if ! git diff origin/master -s --exit-code $file; then
+                        return 0
+                      fi
+                    done
+                    return 1
+                  }
 
-            if [[ "$(git rev-parse --abbrev-ref HEAD)" == "master" ]] || important_files_modified; then
-              yarn jest --coverage --reporters=default --reporters=jest-junit << parameters.args >>
-            else
-              yarn jest --coverage --changedSince=origin/master --reporters=default --reporters=jest-junit << parameters.args >>
-            fi
+                  if [[ "$(git rev-parse --abbrev-ref HEAD)" == "master" ]] || important_files_modified; then
+                    yarn jest --coverage --reporters=default --reporters=jest-junit << parameters.args >>
+                  else
+                    yarn jest --coverage --changedSince=origin/master --reporters=default --reporters=jest-junit << parameters.args >>
+                  fi
+      - unless:
+          condition: << parameters.quick_check >>
+          steps:
+            - run:
+                name: jest
+                command: yarn jest --coverage --reporters=default --reporters=jest-junit << parameters.args >>
       - store_test_results:
           path: reports
 
