@@ -1,4 +1,4 @@
-# Orb Version 4.0.1
+# Orb Version 4.0.2
 
 version: 2.1
 description: Common yarn commands
@@ -123,7 +123,9 @@ jobs:
       - run-script:
           script: jest --reporters=default --reporters=jest-junit << parameters.args >>
       - store_test_results:
-          path: reports
+          path: reports/junit
+      - store_artifacts:
+          path: reports/junit
 
   update-cache:
     executor: node/build
