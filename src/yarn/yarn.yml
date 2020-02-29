@@ -122,13 +122,13 @@ jobs:
       important_files:
         type: string
         default: ""
-      quick_check:
+      only_test_changed:
         type: boolean
         default: false
     steps:
       - setup
       - when:
-          condition: << parameters.quick_check >>
+          condition: << parameters.only_test_changed >>
           steps:
             - run:
                 name: jest
@@ -149,7 +149,7 @@ jobs:
                     yarn jest --coverage --changedSince=origin/master --reporters=default --reporters=jest-junit << parameters.args >>
                   fi
       - unless:
-          condition: << parameters.quick_check >>
+          condition: << parameters.only_test_changed >>
           steps:
             - run:
                 name: jest
