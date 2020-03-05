@@ -1,4 +1,4 @@
-# Orb Version 4.0.2
+# Orb Version 4.1.0
 
 version: 2.1
 description: Common yarn commands
@@ -27,25 +27,42 @@ commands:
           keys:
             - yarn-deps-{{ checksum "yarn.lock" }}
 
-  # By default when yarn runs it does not check the filesystem to ensure the
-  # packages it expects to be installed are actually installed. Using the
-  # --check-files flag ensures that any packages or files missing or out of date
-  # on the file system (i.e. those which might be restored from cache) match what
-  # the yarn.lock file specifies
   install:
+    parameters:
+      force:
+        description: Run yarn install, even if node_modules is already present
+        type: boolean
+        default: false
     steps:
-      - run: yarn
+      - when:
+          condition: << parameters.force >>
+          steps:
+            run: yarn
+      - unless:
+          condition: << parameters.force >>
+          steps:
+            - run:
+                name: yarn install
+                command: |
+                  [ ! -d "node_modules" ] && yarn
 
   setup:
+    parameters:
+      force_install:
+        description: For yarn install to happen even if cache is successfully restored
+        type: boolean
+        default: false
     steps:
       - add_ssh_keys
       - checkout
       - load_dependencies
-      - install
+      - install:
+          force: << parameters.force_install >>
 
   update_dependencies:
     steps:
-      - setup
+      - setup:
+          force_install: true
       - save_dependencies
 
   run-script:
