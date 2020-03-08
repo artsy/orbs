@@ -6,8 +6,6 @@ set -euo pipefail
 check_for_namespace
 
 ORB="$1"
-echo ""
-echo "Validating $NAMESPACE/$1 orb"
 
 if [ -f $ORB ]; then
   ORB_PATH="$ORB"
@@ -15,6 +13,9 @@ if [ -f $ORB ]; then
 else
   ORB_PATH=$(get_orb_path $ORB)
 fi
+
+echo ""
+echo "Validating $NAMESPACE/$ORB orb"
 
 if [ ! -f "$ORB_PATH" ]; then
   echo "No orb exists at $ORB_PATH"
