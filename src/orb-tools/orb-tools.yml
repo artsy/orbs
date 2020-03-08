@@ -14,20 +14,19 @@ commands:
       env-vars:
         description: Comma separated list of environment variables to check for. No spaces.
         type: string
-      steps:
-        - run:
-            name: Check for environment variables
-            command: |
-              IFS=',' read -ra envs <<< "<< parameters.env-vars >>"
+    steps:
+      - run:
+          name: Check for environment variables
+          command: |
+            IFS=',' read -ra envs \<\<\< "<< parameters.env-vars >>"
 
-              #Print the split string
-              for env in "${envs[@]}"
-              do
-                  if [ -z "$env" ]; then
-                    echo "The env var '$env' was expected to be set, but isn't. Set it and then try again."\
-                    exit 1
-                  fi
-              done
+            #Print the split string
+            for env in "${envs[@]}"; do
+              if [ -z "$env" ]; then
+                echo "The env var '$env' was expected to be set, but isn't. Set it and then try again."\
+                exit 1
+              fi
+            done
   setup-paths:
     steps:
       - run:
