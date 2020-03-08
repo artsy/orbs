@@ -7,6 +7,7 @@ orbs:
   node: artsy/node@0.1.0
   queue: eddiewebb/queue@1.0.110
   slack: circleci/slack@3.4.2
+  utils: artsy/orb-tools@dev:55f6486eeacc499426acd697242595df
 
 commands:
   # https://circleci.com/docs/2.0/caching/#basic-example-of-dependency-caching
@@ -138,6 +139,12 @@ jobs:
         type: boolean
         default: true
     steps:
+      - when:
+          condition: << parameters.notify_slack_on_failure >>
+          steps:
+            - utils/check-for-env-vars:
+                name: Check for slack environment variable
+                env-vars: SLACK_WEBHOOK
       - setup
       - when:
           condition: << parameters.only_test_changed >>
