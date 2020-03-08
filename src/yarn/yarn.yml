@@ -114,7 +114,7 @@ jobs:
   jest:
     executor: node/build
     environment:
-      JEST_JUNIT_OUTPUT: "reports/jest/results.xml"
+      JEST_JUNIT_OUTPUT_DIR: "reports/junit/js-test-results.xml"
     parameters:
       args:
         type: string
@@ -155,7 +155,9 @@ jobs:
                 name: jest
                 command: yarn jest --coverage --reporters=default --reporters=jest-junit << parameters.args >>
       - store_test_results:
-          path: reports
+          path: reports/junit
+      - store_artifacts:
+          path: reports/junit
 
   update-cache:
     executor: node/build
