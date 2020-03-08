@@ -132,14 +132,11 @@ jobs:
         type: boolean
         default: false
       notify_slack_on_failure:
-        description: If a slack message should be sent out if master fails
+        description: |
+          If a slack message should be sent out if master fails. Requires SLACK_WEBHOOK environment
+          variable to be set.
         type: boolean
         default: true
-      slack_failure_channel:
-        description: The slack channel to notify if master tests fail
-        type: string
-        # defaults to frontend
-        default: C2TQ4PT8R
     steps:
       - setup
       - when:
@@ -173,7 +170,6 @@ jobs:
           condition: << parameters.notify_slack_on_failure >>
           steps:
             - slack/status:
-                channel: << parameters.slack_failure_channel >>
                 fail_only: true
                 only_for_branches: master
                 failure_message: $CIRCLE_PROJECT_REPONAME's tests failed for master
