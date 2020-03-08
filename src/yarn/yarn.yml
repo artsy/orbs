@@ -143,7 +143,6 @@ jobs:
           condition: << parameters.notify_slack_on_failure >>
           steps:
             - utils/check-for-env-vars:
-                name: Check for slack environment variable
                 env-vars: SLACK_WEBHOOK
       - setup
       - when:
