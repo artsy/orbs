@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Install any missing development dependencies
+# Sets up development dependencies
 
 echo -n "Checking for cicleci... "
 if ! [ -x "$(command -v circleci)" ]; then
@@ -20,6 +20,7 @@ echo -n "Checking for lefthook... "
 if ! [ -x "$(command -v lefthook)" ]; then
   echo "not found, installing"
   brew install Arkweid/lefthook/lefthook
+  lefthook install
 else
   echo "found, skipping."
 fi
