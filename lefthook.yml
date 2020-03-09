@@ -1,0 +1,21 @@
+# For more information on configuring lefthook, see the guide:
+# https://github.com/Arkweid/lefthook/blob/master/docs/full_guide.md
+
+pre-commit:
+  parallel: true
+  commands:
+    validate-orbs:
+      glob: "src/**/*.yml"
+      run: NAMESPACE=artsy scripts/validate_orb.sh {staged_files}
+    validate-circle-config:
+      glob: ".circleci/config.yml"
+      run: circleci config validate
+    validate-shell-scripts:
+      glob: "*.sh"
+      run: shellcheck {staged_files}
+
+lint-all-scripts:
+  commands:
+    lint-scripts:
+      glob: "*.sh"
+      run: shellcheck {all_files}

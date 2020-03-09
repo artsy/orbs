@@ -16,6 +16,11 @@ get_orb_path() {
   echo $YML_PATH
 }
 
+get_orb_from_path() {
+  local filename="$(basename $1)"
+  echo ${filename%.*}
+}
+
 get_orb_version() {
   local YML_PATH=$(get_orb_path $1)
 
@@ -26,15 +31,15 @@ get_orb_version() {
 }
 
 is_orb_changed() {
-    check_for_namespace
+  check_for_namespace
 
-    local ORB="$1"
-    local ORB_PATH="$(get_orb_path $ORB)"
-    local CHANGED="$(git diff --name-only origin/master $ORB_PATH)"
+  local ORB="$1"
+  local ORB_PATH="$(get_orb_path $ORB)"
+  local CHANGED="$(git diff --name-only origin/master $ORB_PATH)"
 
-    if [ ! -z "$CHANGED" ]; then
-      echo "true"
-    fi
+  if [ ! -z "$CHANGED" ]; then
+    echo "true"
+  fi
 }
 
 is_orb_created() {
@@ -47,7 +52,10 @@ is_orb_created() {
 
 is_orb_published() {
   check_for_namespace
-  local PUBLISHED=$(circleci orb info $NAMESPACE/$1 > /dev/null 2>&1; echo $?)
+  local PUBLISHED=$(
+    circleci orb info $NAMESPACE/$1 >/dev/null 2>&1
+    echo $?
+  )
   if [ "$PUBLISHED" -eq "0" ]; then
     echo "true"
   fi
@@ -64,10 +72,10 @@ compare_version() {
   local LESS="<"
   local EQUAL="="
 
-  IFS='.' read -ra VERSION1 <<< "$1"
-  IFS='.' read -ra VERSION2 <<< "$2"
+  IFS='.' read -ra VERSION1 <<<"$1"
+  IFS='.' read -ra VERSION2 <<<"$2"
 
-  for ((i=0; i<${#VERSION1[@]}; ++i)); do
+  for ((i = 0; i < ${#VERSION1[@]}; ++i)); do
     if [ "${VERSION1[i]}" -gt "${VERSION2[i]}" ]; then
       echo $GREATER
       return
