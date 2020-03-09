@@ -16,6 +16,8 @@ For more info on Orbs, checkout their [docs](https://github.com/CircleCI-Public/
 
 Orb files are stored in `src/<orb-name>/<orb-name>.yml`. The nested directory is so that every orb can have associated documentation beside it.
 
+To make it easier to perform changes locally, it's recommended that you run `setup.sh` in the root. This will setup the tools you need to be able to run circle commands locally along with some helpful pre-commit hooks.
+
 ## Versioning
 
 Every orb has a comment like `# Orb Version 1.2.3` on the first line of the file. This comment is significant in that it's used to determine which version of the orb should be deployed (which will be discussed in the next section). Orbs in `master` will have a comment representing the currently deployed production version.
