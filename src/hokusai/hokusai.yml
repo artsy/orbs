@@ -74,19 +74,26 @@ commands:
 
   report-coverage:
     parameters:
+      project-name:
+        type: string
+        description: The name of the project as it appears on github
       report:
         type: boolean
         default: false
         description: Optionally report test coverage
       reports-directory:
         type: string
-        default: "reports"
+        default: reports
         description: Directory where app stores test results - default, "reports"
-      steps:
-        - run:
-          name: Copy coverage reports
-          command: mkdir -p ./<< parameters.reports-directory >> && docker cp hokusai_force_1:/app/<< parameters.reports-directory >> ./
-          when: always
+    steps:
+      - run:
+        name: Create reports directory
+        command: mkdir -p ./<< parameters.reports-directory >>
+        when: always
+      - run:
+        name: Copy test reports
+        command: docker cp hokusai_<< parameters.project-name >>_1:/app/<< parameters.reports-directory >> ./
+        when: always
       - store_test_results:
           path: ./<< parameters.reports-directory >>
 
@@ -102,13 +109,16 @@ jobs:
         type: string
         default: ""
         description: Optional hokusai flags
+      project-name:
+        type: string
+        description: The name of the project as it appears on github
       report:
         type: boolean
         default: false
         description: Optionally report test coverage
       reports-directory:
         type: string
-        default: "reports"
+        default: reports
         description: Directory where app stores test results - default, "reports"
     steps:
       - setup-docker
