@@ -72,6 +72,24 @@ commands:
           name: Test
           command: hokusai test -f << parameters.filename >> << parameters.flags >>
 
+  report-coverage:
+    parameters:
+      report:
+        type: boolean
+        default: false
+        description: Optionally report test coverage
+      reports-directory:
+        type: string
+        default: "reports"
+        description: Directory where app stores test results - default, "reports"
+      steps:
+        - run:
+          name: Copy coverage reports
+          command: mkdir -p ./<< parameters.reports-directory >> && docker cp hokusai_force_1:/app/<< parameters.reports-directory >> ./
+          when: always
+      - store_test_results:
+          path: ./<< parameters.reports-directory >>
+
 jobs:
   test:
     executor: deploy
@@ -84,11 +102,22 @@ jobs:
         type: string
         default: ""
         description: Optional hokusai flags
+      report:
+        type: boolean
+        default: false
+        description: Optionally report test coverage
+      reports-directory:
+        type: string
+        default: "reports"
+        description: Directory where app stores test results - default, "reports"
     steps:
       - setup-docker
       - run-tests:
           filename: << parameters.filename >>
           flags: << parameters.flags >>
+      - report-coverage:
+          report: << parameters.report >>
+          reports-directory: << parameters.reports-directory >>
 
   push:
     executor: deploy
