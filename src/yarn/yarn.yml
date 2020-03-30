@@ -122,7 +122,7 @@ jobs:
         description: Arguments to be passed directly to jest
         type: string
         default: -w 4
-      important_files:
+      run_all_tests_if_these_files_change:
         type: string
         default: ""
         description: |
@@ -152,7 +152,7 @@ jobs:
                 name: jest
                 command: |
                   important_files_modified() {
-                    FILES="yarn.lock << parameters.important_files >>"
+                    FILES="yarn.lock << parameters.run_all_tests_if_these_files_change >>"
                     for file in ${FILES[@]}; do
                       if ! git diff origin/master -s --exit-code $file; then
                         return 0
