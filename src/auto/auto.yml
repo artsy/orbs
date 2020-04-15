@@ -1,4 +1,4 @@
-# Orb Version 1.1.0
+# Orb Version 1.2.0
 
 version: 2.1
 description: Publish NPM packages and canary deployments with Intuit's Auto
@@ -13,11 +13,11 @@ jobs:
   publish:
     executor: node/build
     environment:
-      AUTO_VERSION: v9.10.5
+      AUTO_VERSION: v9.27.2
     parameters:
       version:
         type: string
-        default: v9.10.5
+        default: v9.27.2
       args:
         type: string
         default: ""
@@ -29,11 +29,11 @@ jobs:
   publish-canary:
     executor: node/build
     environment:
-      AUTO_VERSION: v9.15.4
+      AUTO_VERSION: v9.27.2
     parameters:
       version:
         type: string
-        default: v9.15.4
+        default: v9.27.2
       args:
         type: string
         default: ""
