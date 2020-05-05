@@ -1,11 +1,11 @@
-# Orb Version 0.1.2
+# Orb Version 0.1.3
 
 version: 2.1
 description: >
   Excute Docker build via Artsy-managed Docker daemon with a Circle CI fallback
 
 orbs:
-  hokusai: artsy/hokusai@0.7.0
+  hokusai: artsy/hokusai@0.7.3
 
 commands:
   setup-artsy-remote-docker:
