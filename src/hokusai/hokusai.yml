@@ -51,6 +51,7 @@ commands:
       - run:
           name: Push
           command: |
+            set +euo pipefail
             if hokusai registry images --limit 1000 | grep -q $CIRCLE_SHA1; then
               echo "Skipping push as the tag $CIRCLE_SHA1 already exists in the Docker registry"
             else
