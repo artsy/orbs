@@ -1,4 +1,4 @@
-# Orb Version 0.7.2
+# Orb Version 0.7.3
 
 version: 2.1
 description: Reusable hokusai tasks for managing deployments
@@ -6,7 +6,7 @@ description: Reusable hokusai tasks for managing deployments
 executors:
   deploy:
     docker:
-      - image: artsy/hokusai:0.5
+      - image: artsy/hokusai:0.5.9
 
 commands:
   setup:
@@ -61,16 +61,25 @@ commands:
     parameters:
       filename:
         type: string
-        default: ./hokusai/test.yml
+        default: ""
         description: The docker-compose yaml file to use
       flags:
         type: string
         default: ""
         description: Optional hokusai flags
     steps:
-      - run:
-          name: Test
-          command: hokusai test -f << parameters.filename >> << parameters.flags >>
+      - when:
+          condition: << parameters.filename >>
+          steps:
+            - run:
+                name: Test
+                command: hokusai test -f << parameters.filename >> << parameters.flags >>
+      - unless:
+          condition: << parameters.filename >>
+          steps:
+            - run:
+                name: Test
+                command: hokusai test << parameters.flags >>
 
 jobs:
   test:
