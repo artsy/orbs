@@ -5,7 +5,7 @@ description: >
   Excute Docker build via Artsy-managed Docker daemon with a Circle CI fallback
 
 orbs:
-  hokusai: artsy/hokusai@0.7.3
+  hokusai: artsy/hokusai@dev:b36114b65f5b877b52bfac5a3fe7f24c
 
 commands:
   setup-artsy-remote-docker:
