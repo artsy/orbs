@@ -1,4 +1,4 @@
-# Orb Version 1.2.0
+# Orb Version 1.2.1
 
 version: 2.1
 description: Publish NPM packages and canary deployments with Intuit's Auto
@@ -46,7 +46,7 @@ jobs:
               circleci-agent step halt
             fi
 
-            if [ ! -z "$CIRCLE_PR_NUMBER" ]; then
+            if [ -n "$CIRCLE_PR_NUMBER" ]; then
               echo "Skipping, can't deploy canaries for forks due to permissions issues."
               circleci-agent step halt
             fi

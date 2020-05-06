@@ -19,3 +19,9 @@ lint-all-scripts:
     lint-scripts:
       glob: "*.sh"
       run: shellcheck {all_files}
+
+fix-scripts:
+  commands:
+    fix-scripts:
+      glob: "*.sh"
+      run: shellcheck -f diff {all_files} | git apply

@@ -1,17 +1,18 @@
 #!/bin/bash
 set -euo pipefail
 
+# shellcheck disable=SC1091
 . ./scripts/orb_utils.sh
 
 check_for_namespace
 
 ORB="$1"
 
-if [ -f $ORB ]; then
+if [ -f "$ORB" ]; then
   ORB_PATH="$ORB"
-  ORB=$(get_orb_from_path $ORB)
+  ORB=$(get_orb_from_path "$ORB")
 else
-  ORB_PATH=$(get_orb_path $ORB)
+  ORB_PATH=$(get_orb_path "$ORB")
 fi
 
 echo ""
@@ -22,13 +23,13 @@ if [ ! -f "$ORB_PATH" ]; then
   exit 1
 fi
 
-VERSION=$(get_orb_version $ORB)
-VERSION_COMMENT=$(head -n 1 $ORB_PATH)
-IS_PUBLISHED=$(is_orb_published $ORB)
-IS_CREATED=$(is_orb_created $ORB)
+VERSION=$(get_orb_version "$ORB")
+VERSION_COMMENT=$(head -n 1 "$ORB_PATH")
+IS_PUBLISHED=$(is_orb_published "$ORB")
+IS_CREATED=$(is_orb_created "$ORB")
 
 # Ensure the version is defined and that the version comment actually is a comment...
-if [ -z $VERSION ] || [ ! "${VERSION_COMMENT:0:1}" == "#" ]; then
+if [ -z "$VERSION" ] || [ ! "${VERSION_COMMENT:0:1}" == "#" ]; then
   echo ""
   echo "Orb at $ORB_PATH does not have a version comment"
   echo "Add something like '# Orb Version 1.0.0' at the top of the file"
@@ -36,16 +37,19 @@ if [ -z $VERSION ] || [ ! "${VERSION_COMMENT:0:1}" == "#" ]; then
   return
 fi
 
-if [ ! -z "$IS_CREATED" ] && [ ! -z "$IS_PUBLISHED" ]; then
+if [ -n "$IS_CREATED" ] && [ -n "$IS_PUBLISHED" ]; then
 
-  PUBLISHED_VERSION=$(get_published_orb_version $ORB)
+  PUBLISHED_VERSION=$(get_published_orb_version "$ORB")
   BRANCH=$(git rev-parse --abbrev-ref HEAD)
   if [ "$BRANCH" != "master" ]; then
 
-    CHANGED_FILES=$(git diff --name-only HEAD..origin/master)
-    UPDATED_FILES=$(git status -s | cut -c4-)
-    ALL_CHANGES=("${CHANGED_FILES[@]}" "${UPDATED_FILES[@]}")
-    for file in ${ALL_CHANGES[@]}; do
+    CHANGED_FILES="$(git diff --name-only HEAD..origin/master)"
+    UPDATED_FILES="$(git status -s | cut -c4-)"
+    #shellcheck disable=SC2206
+    ALL_CHANGES=(${CHANGED_FILES[@]} ${UPDATED_FILES[@]})
+    for file in "${ALL_CHANGES[@]}"; do
+      echo "ORB_PATH: $ORB_PATH"
+      echo "file: $file"
       if [[ "$ORB_PATH" == *"$file" ]] && [[ "$VERSION" == "$PUBLISHED_VERSION" ]]; then
         echo ""
         echo "$NAMESPACE/$ORB has been updated since master but hasn't had its version bumped."
@@ -58,6 +62,6 @@ if [ ! -z "$IS_CREATED" ] && [ ! -z "$IS_PUBLISHED" ]; then
 
 fi
 
-circleci orb validate $ORB_PATH
+circleci orb validate "$ORB_PATH"
 
 echo ""
