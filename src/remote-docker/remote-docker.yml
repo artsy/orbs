@@ -1,4 +1,4 @@
-# Orb Version 0.1.1
+# Orb Version 0.1.2
 
 version: 2.1
 description: >
@@ -21,7 +21,7 @@ commands:
           name: Setup Artsy Remote Docker Connection
           command: |
             if [[ -n "$AWS_ACCESS_KEY_ID" && -n "$AWS_SECRET_ACCESS_KEY" ]]; then
-              printf "Setting up remote docker connection...\n"
+              printf "%s Setting up remote docker connection...\n" "$(TZ=UTC date)"
               mkdir ~/.docker
               aws s3 cp s3://<< parameters.artsy_s3_path_root >>/ca.pem ~/.docker/ca.pem
               aws s3 cp s3://<< parameters.artsy_s3_path_root >>/cert.pem ~/.docker/cert.pem
@@ -53,16 +53,18 @@ commands:
             if test -f "$BASH_ENV"; then
               source $BASH_ENV
 
-              printf "Building image...\n"
+              printf "%s Building image...\n" "$(TZ=UTC date)"
               BUILD_TAG="$CIRCLE_SHA1" hokusai build
+              printf "%s Image built.\n" "$(TZ=UTC date)"
 
-              printf "Pushing image...\n"
+              printf "%s Pushing image...\n" "$(TZ=UTC date)"
               hokusai registry push \
                 --no-build \
                 --local-tag="$CIRCLE_SHA1" \
                 --tag="$CIRCLE_SHA1" \
                 --overwrite \
                 --skip-latest
+              printf "%s Image pushed.\n" "$(TZ=UTC date)"
 
               printf "Skipping local docker build fallback...\n"
               circleci step halt
@@ -76,16 +78,18 @@ commands:
           name: Build & Push via Circle CI Fallback
           no_output_timeout: 15m
           command: |
-            printf "Building image...\n"
+            printf "%s Building image...\n" "$(TZ=UTC date)"
             BUILD_TAG="$CIRCLE_SHA1" hokusai build
+            printf "%s Image built.\n" "$(TZ=UTC date)"
 
-            printf "Pushing image...\n"
+            printf "%s Pushing image...\n" "$(TZ=UTC date)"
             hokusai registry push \
               --no-build \
               --local-tag="$CIRCLE_SHA1" \
               --tag="$CIRCLE_SHA1" \
               --overwrite \
               --skip-latest
+            printf "%s Image pushed.\n" "$(TZ=UTC date)"
 
 jobs:
   build:

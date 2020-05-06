@@ -17,9 +17,9 @@ set -euo pipefail
 check_for_namespace
 
 # Grab the current git branch
-BRANCH=$(git branch | grep \* | cut -d ' ' -f2)
+BRANCH=$(git branch | grep "\*" | cut -d ' ' -f2)
 ORB="$1"
-IS_CHANGED=$(is_orb_changed $ORB)
+IS_CHANGED=$(is_orb_changed "$ORB")
 
 if [ "$BRANCH" != "master" ] && [ -z "$IS_CHANGED" ]; then
   echo "$(YELLOW "[skipped]") Publish for $NAMESPACE/$ORB because there are no changes"
@@ -30,7 +30,6 @@ echo ""
 echo "----- Begin publish of $NAMESPACE/$1 orb -----"
 echo ""
 
-
 # Make sure used variables are defined
 DRY_RUN=${DRY_RUN:-""}
 CI=${CI:-""}
@@ -39,24 +38,22 @@ CIRCLE_SHA1=${CIRCLE_SHA1:-$(git rev-parse HEAD)}
 SLACK_WEBHOOK_URL=${SLACK_WEBHOOK_URL:-""}
 
 # Set a dry-run mode
-if [ ! -z "$DRY_RUN" ] || [ -z "$CI" ]; then
+if [ -n "$DRY_RUN" ] || [ -z "$CI" ]; then
   DRY_RUN="true"
-  echo $(YELLOW "[Running in dry-run mode]")
+  echo "$(YELLOW "[Running in dry-run mode]")"
 else
   DRY_RUN=""
-fi 
-
+fi
 
 # Build CircleCI token argument
 TOKEN=""
-if [ ! -z "${CIRCLECI_API_KEY:-}" ]; then
+if [ -n "${CIRCLECI_API_KEY:-}" ]; then
   TOKEN="--token $CIRCLECI_API_KEY"
 elif [ -z "$DRY_RUN" ]; then
-  echo $(RED "Must provide CIRCLECI_API_KEY env var")
+  echo "$(RED "Must provide CIRCLECI_API_KEY env var")"
   echo ""
   exit 1
 fi
-
 
 # Build the dev version prefix. When not on the master branch this will be
 # used to publish a dev version of the orb. That can be pulled in using
@@ -67,7 +64,7 @@ DEV=""
 VERSION_POSTFIX=""
 if [ "$BRANCH" != "master" ]; then
   DEV="dev:"
-  echo $(YELLOW "[Running in dev mode]")
+  echo "$(YELLOW "[Running in dev mode]")"
 
   # Build the version postfix which should be unique per branch
   VERSION_POSTFIX="$(echo "$BRANCH" | md5sum | awk '{ print $1 }')"
@@ -75,73 +72,72 @@ if [ "$BRANCH" != "master" ]; then
 fi
 
 # When in dev mode
-if [ ! -z "$DEV" ]; then
+if [ -n "$DEV" ]; then
   echo ""
   echo "This will be a dev deployment (prefixed with dev:)"
 fi
 
-ORB_PATH=$(get_orb_path $ORB)
-VERSION=$(get_orb_version $ORB)
-IS_PUBLISHED=$(is_orb_published $ORB)
-IS_CREATED=$(is_orb_created $ORB)
+ORB_PATH=$(get_orb_path "$ORB")
+VERSION=$(get_orb_version "$ORB")
+IS_PUBLISHED=$(is_orb_published "$ORB")
+IS_CREATED=$(is_orb_created "$ORB")
 
 # Ensure the orb is valid
-circleci orb validate $ORB_PATH
+circleci orb validate "$ORB_PATH"
 
-if [ ! -z "$DEV" ]; then
+if [ -n "$DEV" ]; then
   FULL_VERSION="$DEV$VERSION_POSTFIX"
 else
   FULL_VERSION="$VERSION"
 fi
 
 # If the orb has been previously published (i.e. it already exists in circle's registry)
-if [ ! -z "$IS_PUBLISHED" ]; then
+if [ -n "$IS_PUBLISHED" ]; then
 
-  LAST_PUBLISHED=$(get_published_orb_version $ORB)
+  LAST_PUBLISHED=$(get_published_orb_version "$ORB")
 
-  case $(compare_version $VERSION $LAST_PUBLISHED) in
-    "=")
-      # When not in dev mode
-      if [ -z "$DEV" ]; then
-        echo "$NAMESPACE/$ORB@$VERSION is the latest, skipping publish"
-        exit 0
-      fi
-      ;;
-    "<")
-      echo $(RED "$NAMESPACE/$ORB@$LAST_PUBLISHED is the latest, cannot publish older version $VERSION")
-      echo $(RED "Please update $ORB_PATH to have a version greater than $LAST_PUBLISHED")
-      exit 1
-      ;;
-    ">")
-      # when not in dev mode
-      if [ -z "$DEV" ]; then
-        echo "Preparing to bump $NAMESPACE/$ORB from $LAST_PUBLISHED to $VERSION"
-      fi
-      ;;
-    *)
-      echo $(RED "Version comparison for $NAMESPACE/$ORB failed.")
-      echo $(RED "Current version: $VERSION")
-      echo $(RED "Published version: $LAST_PUBLISHED")
-      exit 1
-      ;;
+  case $(compare_version "$VERSION" "$LAST_PUBLISHED") in
+  "=")
+    # When not in dev mode
+    if [ -z "$DEV" ]; then
+      echo "$NAMESPACE/$ORB@$VERSION is the latest, skipping publish"
+      exit 0
+    fi
+    ;;
+  "<")
+    echo "$(RED "$NAMESPACE/$ORB@$LAST_PUBLISHED is the latest, cannot publish older version $VERSION")"
+    echo "$(RED "Please update $ORB_PATH to have a version greater than $LAST_PUBLISHED")"
+    exit 1
+    ;;
+  ">")
+    # when not in dev mode
+    if [ -z "$DEV" ]; then
+      echo "Preparing to bump $NAMESPACE/$ORB from $LAST_PUBLISHED to $VERSION"
+    fi
+    ;;
+  *)
+    echo "$(RED "Version comparison for $NAMESPACE/$ORB failed.")"
+    echo "$(RED "Current version: $VERSION")"
+    echo "$(RED "Published version: $LAST_PUBLISHED")"
+    exit 1
+    ;;
   esac
 
 elif [ -z "$IS_CREATED" ]; then
   echo "Orb $NAMESPACE/$ORB isn't in the registry. Creating its registry entry..."
-  circleci orb create $NAMESPACE/$ORB $TOKEN --no-prompt
+  circleci orb create "$NAMESPACE/$ORB" "$TOKEN" --no-prompt
 fi
-
 
 # Publish to CircleCI (when it's not a dry run)
 if [ -z "$DRY_RUN" ]; then
   echo "Preparing to publish dev orb $NAMESPACE/$ORB@$FULL_VERSION"
-  circleci orb publish $ORB_PATH $NAMESPACE/$ORB@$FULL_VERSION $TOKEN
+  circleci orb publish "$ORB_PATH" "$NAMESPACE/$ORB@$FULL_VERSION" "$TOKEN"
 else
   echo "$(YELLOW "[skipped]") circleci orb publish $ORB_PATH $NAMESPACE/$ORB@$FULL_VERSION"
 fi
 
 # Publish to slack (when it's neither a dry run or dev mode)
-if [ -z "$DRY_RUN" ] && [ -z "$DEV" ] && [ ! -z "$SLACK_WEBHOOK_URL" ]; then
+if [ -z "$DRY_RUN" ] && [ -z "$DEV" ] && [ -n "$SLACK_WEBHOOK_URL" ]; then
   ./slack \
     -color "good" \
     -title "Circle CI $ORB orb v$VERSION published!" \
