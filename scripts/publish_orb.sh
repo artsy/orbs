@@ -125,7 +125,7 @@ if [ -n "$IS_PUBLISHED" ]; then
 
 elif [ -z "$IS_CREATED" ]; then
   echo "Orb $NAMESPACE/$ORB isn't in the registry. Creating its registry entry..."
-  circleci orb create "$NAMESPACE/$ORB" "$TOKEN" --no-prompt
+  circleci orb create "$NAMESPACE/$ORB" $TOKEN --no-prompt
 fi
 
 # Publish to CircleCI (when it's not a dry run)
