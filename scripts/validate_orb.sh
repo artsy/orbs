@@ -1,7 +1,6 @@
 #!/bin/bash
 set -euo pipefail
 
-# shellcheck disable=SC1091
 . ./scripts/orb_utils.sh
 
 check_for_namespace
