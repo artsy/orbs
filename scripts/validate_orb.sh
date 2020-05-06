@@ -1,6 +1,7 @@
 #!/bin/bash
 set -euo pipefail
 
+# shellcheck disable=SC1091
 . ./scripts/orb_utils.sh
 
 check_for_namespace
@@ -42,8 +43,9 @@ if [ -n "$IS_CREATED" ] && [ -n "$IS_PUBLISHED" ]; then
   BRANCH=$(git rev-parse --abbrev-ref HEAD)
   if [ "$BRANCH" != "master" ]; then
 
-    CHANGED_FILES=$(git diff --name-only HEAD..origin/master)
-    UPDATED_FILES=$(git status -s | cut -c4-)
+    CHANGED_FILES="$(git diff --name-only HEAD..origin/master)"
+    UPDATED_FILES="$(git status -s | cut -c4-)"
+    echo "$UPDATED_FILES"
     ALL_CHANGES=("${CHANGED_FILES[@]}" "${UPDATED_FILES[@]}")
     for file in "${ALL_CHANGES[@]}"; do
       if [[ "$ORB_PATH" == *"$file" ]] && [[ "$VERSION" == "$PUBLISHED_VERSION" ]]; then
