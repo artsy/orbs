@@ -131,7 +131,7 @@ fi
 # Publish to CircleCI (when it's not a dry run)
 if [ -z "$DRY_RUN" ]; then
   echo "Preparing to publish dev orb $NAMESPACE/$ORB@$FULL_VERSION"
-  circleci orb publish "$ORB_PATH" "$NAMESPACE/$ORB@$FULL_VERSION" "$TOKEN"
+  circleci orb publish "$ORB_PATH" "$NAMESPACE/$ORB@$FULL_VERSION" $TOKEN
 else
   echo "$(YELLOW "[skipped]") circleci orb publish $ORB_PATH $NAMESPACE/$ORB@$FULL_VERSION"
 fi
