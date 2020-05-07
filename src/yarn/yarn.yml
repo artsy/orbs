@@ -137,7 +137,7 @@ jobs:
           If a slack message should be sent out if master fails. Requires SLACK_WEBHOOK environment
           variable to be set.
         type: boolean
-        default: true
+        default: false
     steps:
       - when:
           condition: << parameters.notify_slack_on_failure >>
