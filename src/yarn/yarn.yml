@@ -1,4 +1,4 @@
-# Orb Version 5.1.0
+# Orb Version 5.1.1
 
 version: 2.1
 description: Common yarn commands
@@ -7,7 +7,7 @@ orbs:
   node: artsy/node@1.0.0
   queue: eddiewebb/queue@1.0.110
   slack: circleci/slack@3.4.2
-  utils: artsy/orb-tools@dev:55f6486eeacc499426acd697242595df
+  utils: artsy/orb-tools@dev:4ab104781797303488b75d3fd18e99ee
 
 commands:
   # https://circleci.com/docs/2.0/caching/#basic-example-of-dependency-caching

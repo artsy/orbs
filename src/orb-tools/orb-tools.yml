@@ -1,4 +1,4 @@
-# Orb Version 0.4.0
+# Orb Version 0.4.1
 
 version: 2.1
 description: A simple set of tools for managing orbs by Artsy
@@ -18,12 +18,10 @@ commands:
       - run:
           name: Check for environment variables
           command: |
-            IFS=',' read -ra envs \<\<\< "<< parameters.env-vars >>"
-
             #Print the split string
-            for env in "${envs[@]}"; do
-              if [ -z "$env" ]; then
-                echo "The env var '$env' was expected to be set, but isn't. Set it and then try again."\
+            for env in << parameters.env-vars >>; do
+              if [ -z "$(printenv $env)" ]; then
+                echo "The env var '$env' was expected to be set, but isn't. Set it and then try again."
                 exit 1
               fi
             done
