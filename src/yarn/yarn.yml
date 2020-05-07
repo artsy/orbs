@@ -1,10 +1,10 @@
-# Orb Version 4.1.0
+# Orb Version 5.1.0
 
 version: 2.1
 description: Common yarn commands
 
 orbs:
-  node: artsy/node@0.1.0
+  node: artsy/node@1.0.0
   queue: eddiewebb/queue@1.0.110
   slack: circleci/slack@3.4.2
   utils: artsy/orb-tools@dev:55f6486eeacc499426acd697242595df
@@ -14,7 +14,7 @@ commands:
   save_dependencies:
     steps:
       - save_cache:
-          key: yarn-deps-{{ checksum "yarn.lock" }}
+          key: yarn-deps-v1-{{ checksum "yarn.lock" }}
           paths:
             - ./node_modules
 
@@ -27,7 +27,7 @@ commands:
     steps:
       - restore_cache:
           keys:
-            - yarn-deps-{{ checksum "yarn.lock" }}
+            - yarn-deps-v1-{{ checksum "yarn.lock" }}
 
   # By default when yarn runs it does not check the filesystem to ensure the
   # packages it expects to be installed are actually installed. Using the
