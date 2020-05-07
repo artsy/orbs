@@ -43,9 +43,9 @@ if [ -n "$IS_CREATED" ] && [ -n "$IS_PUBLISHED" ]; then
   if [ "$BRANCH" != "master" ]; then
 
     CHANGED_FILES="$(git diff --name-only HEAD..origin/master)"
-    ADDED_FILES="$(git status | grep "new file" | tr -s ' ' | cut -d ' ' -f 3)"
+    UPDATED_FILES="$(git status -s | cut -c4-)"
     #shellcheck disable=SC2206
-    ALL_CHANGES=(${CHANGED_FILES[@]} ${ADDED_FILES[@]})
+    ALL_CHANGES=(${CHANGED_FILES[@]} ${UPDATED_FILES[@]})
     for file in "${ALL_CHANGES[@]}"; do
       if [[ "$ORB_PATH" == *"$file" ]] && [[ "$VERSION" == "$PUBLISHED_VERSION" ]]; then
         echo ""
