@@ -1,4 +1,4 @@
-# Orb Version 5.0.0
+# Orb Version 5.1.0
 
 version: 2.1
 description: Common yarn commands
@@ -6,6 +6,8 @@ description: Common yarn commands
 orbs:
   node: artsy/node@1.0.0
   queue: eddiewebb/queue@1.0.110
+  slack: circleci/slack@3.4.2
+  utils: artsy/orb-tools@dev:55f6486eeacc499426acd697242595df
 
 commands:
   # https://circleci.com/docs/2.0/caching/#basic-example-of-dependency-caching
@@ -117,11 +119,66 @@ jobs:
       JEST_JUNIT_OUTPUT_DIR: "reports/junit/js-test-results.xml"
     parameters:
       args:
+        description: Arguments to be passed directly to jest
         type: string
         default: -w 4
+      run_all_tests_if_these_files_change:
+        type: string
+        default: ""
+        description: |
+          If any of these files have changed, re-run the complete test suite instead of doing incremental tests.
+          This is used in conjunction with `only_test_changed` to determine what global resources may alter test
+          outcomes that jest may not be able to pick up on.
+      only_test_changed:
+        type: boolean
+        default: false
+      notify_slack_on_failure:
+        description: |
+          If a slack message should be sent out if master fails. Requires SLACK_WEBHOOK environment
+          variable to be set.
+        type: boolean
+        default: false
     steps:
-      - run-script:
-          script: jest --reporters=default --reporters=jest-junit << parameters.args >>
+      - when:
+          condition: << parameters.notify_slack_on_failure >>
+          steps:
+            - utils/check-for-env-vars:
+                env-vars: SLACK_WEBHOOK
+      - setup
+      - when:
+          condition: << parameters.only_test_changed >>
+          steps:
+            - run:
+                name: jest
+                command: |
+                  important_files_modified() {
+                    FILES="yarn.lock << parameters.run_all_tests_if_these_files_change >>"
+                    for file in ${FILES[@]}; do
+                      if ! git diff origin/master -s --exit-code $file; then
+                        return 0
+                      fi
+                    done
+                    return 1
+                  }
+
+                  if [[ "$(git rev-parse --abbrev-ref HEAD)" == "master" ]] || important_files_modified; then
+                    yarn jest --coverage --reporters=default --reporters=jest-junit << parameters.args >>
+                  else
+                    yarn jest --coverage --changedSince=origin/master --reporters=default --reporters=jest-junit << parameters.args >>
+                  fi
+      - unless:
+          condition: << parameters.only_test_changed >>
+          steps:
+            - run:
+                name: jest
+                command: yarn jest --coverage --reporters=default --reporters=jest-junit << parameters.args >>
+      - when:
+          condition: << parameters.notify_slack_on_failure >>
+          steps:
+            - slack/status:
+                fail_only: true
+                only_for_branches: master
+                failure_message: $CIRCLE_PROJECT_REPONAME's tests failed for master
       - store_test_results:
           path: reports/junit
       - store_artifacts:

@@ -47,8 +47,6 @@ if [ -n "$IS_CREATED" ] && [ -n "$IS_PUBLISHED" ]; then
     #shellcheck disable=SC2206
     ALL_CHANGES=(${CHANGED_FILES[@]} ${UPDATED_FILES[@]})
     for file in "${ALL_CHANGES[@]}"; do
-      echo "ORB_PATH: $ORB_PATH"
-      echo "file: $file"
       if [[ "$ORB_PATH" == *"$file" ]] && [[ "$VERSION" == "$PUBLISHED_VERSION" ]]; then
         echo ""
         echo "$NAMESPACE/$ORB has been updated since master but hasn't had its version bumped."
