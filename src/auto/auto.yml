@@ -39,6 +39,8 @@ jobs:
         type: string
         default: ""
     steps:
-      - utils/skip-if-fork-or-not-pr
+      - utils/skip-if-fork-or-not-pr:
+          pr-skip-message: Skipping, only deploys canaries on PR builds
+          fork-skip-message: Skipping, can't deploy canaries from a fork
       - yarn/pre-release
       - auto/canary
