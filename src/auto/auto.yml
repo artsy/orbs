@@ -1,4 +1,4 @@
-# Orb Version 1.2.1
+# Orb Version 1.2.2
 
 version: 2.1
 description: Publish NPM packages and canary deployments with Intuit's Auto
@@ -7,6 +7,7 @@ orbs:
   yarn: artsy/yarn@4.0.0
   node: artsy/node@0.1.0
   auto: auto/release@0.1.0
+  utils: artsy/orb-tools@dev:da826a2455c0d9f9ce31f71db9b0601e
 
 jobs:
   # Publishes a package to NPM
@@ -38,17 +39,6 @@ jobs:
         type: string
         default: ""
     steps:
-      - run:
-          name: Don't deploy canary if it's not a PR or if it's a fork
-          command: |
-            if [ -z "$CIRCLE_PULL_REQUEST" ]; then
-              echo "Skipping, only deploys canaries on PR builds"
-              circleci-agent step halt
-            fi
-
-            if [ -n "$CIRCLE_PR_NUMBER" ]; then
-              echo "Skipping, can't deploy canaries for forks due to permissions issues."
-              circleci-agent step halt
-            fi
+      - utils/skip-if-fork-or-not-pr
       - yarn/pre-release
       - auto/canary
