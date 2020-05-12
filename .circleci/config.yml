@@ -32,6 +32,7 @@ workflows:
   build:
     jobs:
       - validate_orbs:
+          context: circleci-api
           filters:
             branches:
               ignore:

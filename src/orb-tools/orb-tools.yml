@@ -1,4 +1,4 @@
-# Orb Version 0.4.1
+# Orb Version 0.5.0
 
 version: 2.1
 description: A simple set of tools for managing orbs by Artsy
@@ -18,6 +18,11 @@ commands:
       - run:
           name: Check for environment variables
           command: |
+            # Skip Forks
+            if [ -n "$CIRCLE_PR_NUMBER" ]; then
+              echo "Skipping, forks won't have the right env vars anyway."
+              exit 0
+            fi
             #Print the split string
             for env in << parameters.env-vars >>; do
               if [ -z "$(printenv $env)" ]; then
@@ -25,6 +30,27 @@ commands:
                 exit 1
               fi
             done
+  skip-if-fork-or-not-pr:
+    parameters:
+      pr-skip-message:
+        type: string
+        default: Skipping because this isn't a pr build
+      fork-skip-message:
+        type: string
+        default: Skipping because this is a fork
+    steps:
+      - run:
+          name: Don't deploy canary if it's not a PR or if it's a fork
+          command: |
+            if [ -z "$CIRCLE_PULL_REQUEST" ]; then
+              echo "<< parameters.pr-skip-message >>"
+              circleci-agent step halt
+            fi
+
+            if [ -n "$CIRCLE_PR_NUMBER" ]; then
+              echo "<< parameters.fork-skip-message >>"
+              circleci-agent step halt
+            fi
   setup-paths:
     steps:
       - run:
