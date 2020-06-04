@@ -91,7 +91,7 @@ jobs:
     parameters:
       executor:
         type: executor
-        default: hokusai/deploy
+        default: deploy
       filename:
         type: string
         default: ./hokusai/test.yml
@@ -111,7 +111,7 @@ jobs:
     parameters:
       executor:
         type: executor
-        default: hokusai/deploy
+        default: deploy
     steps:
       - push-image
 
@@ -120,7 +120,7 @@ jobs:
     parameters:
       executor:
         type: executor
-        default: hokusai/deploy
+        default: deploy
       project-name:
         type: string
         description: The name of the project as it appears on github
@@ -148,7 +148,7 @@ jobs:
     parameters:
       executor:
         type: executor
-        default: hokusai/deploy
+        default: deploy
       time-out:
         type: string
         description: How long to wait for shell output before timing out
