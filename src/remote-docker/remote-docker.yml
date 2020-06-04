@@ -1,4 +1,4 @@
-# Orb Version 0.1.3
+# Orb Version 0.1.4
 
 version: 2.1
 description: >
@@ -93,8 +93,11 @@ commands:
 
 jobs:
   build:
-    executor: hokusai/deploy
+    executor: << parameters.executor >>
     parameters:
+      executor:
+        type: executor
+        default: hokusai/deploy
       artsy_docker_host:
         type: string
         default: docker.artsy.net
