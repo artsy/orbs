@@ -9,7 +9,7 @@ executors:
       - image: artsy/hokusai:0.5.9
   beta:
     docker:
-      - image: artsy/hokusai:head
+      - image: artsy/hokusai:beta
 
 commands:
   setup:
