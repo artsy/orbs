@@ -87,9 +87,9 @@ commands:
 
 jobs:
   test:
-    executor: << parameters.executor >>
+    executor: << parameters.e >>
     parameters:
-      executor:
+      e:
         type: executor
         default: deploy
       filename:
@@ -107,18 +107,18 @@ jobs:
           flags: << parameters.flags >>
 
   push:
-    executor: << parameters.executor >>
+    executor: << parameters.e >>
     parameters:
-      executor:
+      e:
         type: executor
         default: deploy
     steps:
       - push-image
 
   deploy-staging:
-    executor: << parameters.executor >>
+    executor: << parameters.e >>
     parameters:
-      executor:
+      e:
         type: executor
         default: deploy
       project-name:
@@ -144,9 +144,9 @@ jobs:
           command: git push git@github.com:artsy/<< parameters.project-name >>.git $CIRCLE_SHA1:refs/heads/staging --force
 
   deploy-production:
-    executor: << parameters.executor >>
+    executor: << parameters.e >>
     parameters:
-      executor:
+      e:
         type: executor
         default: deploy
       time-out:
