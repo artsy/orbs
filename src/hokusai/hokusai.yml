@@ -7,6 +7,9 @@ executors:
   deploy:
     docker:
       - image: artsy/hokusai:0.5.9
+  beta:
+    docker:
+      - image: artsy/hokusai:head
 
 commands:
   setup:
@@ -84,8 +87,11 @@ commands:
 
 jobs:
   test:
-    executor: deploy
+    executor: << parameters.executor >>
     parameters:
+      executor:
+        type: executor
+        default: deploy
       filename:
         type: string
         default: ./hokusai/test.yml
@@ -101,13 +107,20 @@ jobs:
           flags: << parameters.flags >>
 
   push:
-    executor: deploy
+    executor: << parameters.executor >>
+    parameters:
+      executor:
+        type: executor
+        default: deploy
     steps:
       - push-image
 
   deploy-staging:
-    executor: deploy
+    executor: << parameters.executor >>
     parameters:
+      executor:
+        type: executor
+        default: deploy
       project-name:
         type: string
         description: The name of the project as it appears on github
@@ -131,8 +144,11 @@ jobs:
           command: git push git@github.com:artsy/<< parameters.project-name >>.git $CIRCLE_SHA1:refs/heads/staging --force
 
   deploy-production:
-    executor: deploy
+    executor: << parameters.executor >>
     parameters:
+      executor:
+        type: executor
+        default: deploy
       time-out:
         type: string
         description: How long to wait for shell output before timing out
