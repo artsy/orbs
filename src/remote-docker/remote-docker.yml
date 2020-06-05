@@ -4,8 +4,13 @@ version: 2.1
 description: >
   Excute Docker build via Artsy-managed Docker daemon with a Circle CI fallback
 
-orbs:
-  hokusai: artsy/hokusai@0.7.4
+executors:
+  deploy:
+    docker:
+      - image: artsy/hokusai:0.5.10
+  beta:
+    docker:
+      - image: artsy/hokusai:beta
 
 commands:
   setup-artsy-remote-docker:
@@ -97,7 +102,7 @@ jobs:
     parameters:
       executor:
         type: executor
-        default: hokusai/deploy
+        default: deploy
       artsy_docker_host:
         type: string
         default: docker.artsy.net
