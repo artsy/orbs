@@ -1,11 +1,16 @@
-# Orb Version 0.1.3
+# Orb Version 0.1.4
 
 version: 2.1
 description: >
   Excute Docker build via Artsy-managed Docker daemon with a Circle CI fallback
 
-orbs:
-  hokusai: artsy/hokusai@0.7.3
+executors:
+  deploy:
+    docker:
+      - image: artsy/hokusai:0.5.10
+  beta:
+    docker:
+      - image: artsy/hokusai:beta
 
 commands:
   setup-artsy-remote-docker:
@@ -91,10 +96,33 @@ commands:
               --skip-latest
             printf "%s Image pushed.\n" "$(TZ=UTC date)"
 
+  test:
+    steps:
+      - run: hokusai registry pull --tag "$CIRCLE_SHA1"
+      - run:
+          name: Test
+          command: hokusai test --no-build
+          no_output_timeout: 3600s
+
 jobs:
-  build:
-    executor: hokusai/deploy
+  test:
+    executor: << parameters.executor >>
     parameters:
+      executor:
+        type: executor
+        default: deploy
+    steps:
+      - add_ssh_keys
+      - checkout
+      - setup_remote_docker
+      - test
+
+  build:
+    executor: << parameters.executor >>
+    parameters:
+      executor:
+        type: executor
+        default: deploy
       artsy_docker_host:
         type: string
         default: docker.artsy.net
