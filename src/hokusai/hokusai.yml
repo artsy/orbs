@@ -6,7 +6,7 @@ description: Reusable hokusai tasks for managing deployments
 executors:
   deploy:
     docker:
-      - image: artsy/hokusai:0.5.10
+      - image: artsy/hokusai:0.5.11
   beta:
     docker:
       - image: artsy/hokusai:beta
