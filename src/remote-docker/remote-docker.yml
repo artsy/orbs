@@ -1,4 +1,4 @@
-# Orb Version 0.1.4
+# Orb Version 0.1.5
 
 version: 2.1
 description: >
@@ -7,7 +7,7 @@ description: >
 executors:
   deploy:
     docker:
-      - image: artsy/hokusai:0.5.10
+      - image: artsy/hokusai:0.5.11
   beta:
     docker:
       - image: artsy/hokusai:beta
