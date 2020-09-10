@@ -104,6 +104,8 @@ commands:
 
 jobs:
   test:
+    environment:
+      BUILD_TARGET: builder
     executor: << parameters.executor >>
     parameters:
       executor:
