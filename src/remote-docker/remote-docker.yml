@@ -59,13 +59,12 @@ commands:
               source $BASH_ENV
 
               printf "%s Building image...\n" "$(TZ=UTC date)"
-              BUILD_TAG="$CIRCLE_SHA1" hokusai build
+              BUILD_TARGET="$BUILD_TARGET" hokusai build
               printf "%s Image built.\n" "$(TZ=UTC date)"
 
               printf "%s Pushing image...\n" "$(TZ=UTC date)"
               hokusai registry push \
                 --no-build \
-                --local-tag="$CIRCLE_SHA1" \
                 --tag="$CIRCLE_SHA1" \
                 --overwrite \
                 --skip-latest
@@ -84,13 +83,12 @@ commands:
           no_output_timeout: 15m
           command: |
             printf "%s Building image...\n" "$(TZ=UTC date)"
-            BUILD_TAG="$CIRCLE_SHA1" hokusai build
+            BUILD_TARGET="$BUILD_TARGET" hokusai build
             printf "%s Image built.\n" "$(TZ=UTC date)"
 
             printf "%s Pushing image...\n" "$(TZ=UTC date)"
             hokusai registry push \
               --no-build \
-              --local-tag="$CIRCLE_SHA1" \
               --tag="$CIRCLE_SHA1" \
               --overwrite \
               --skip-latest
