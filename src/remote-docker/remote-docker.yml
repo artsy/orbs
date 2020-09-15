@@ -1,4 +1,4 @@
-# Orb Version 0.1.5
+# Orb Version 0.1.6
 
 version: 2.1
 description: >
@@ -59,7 +59,7 @@ commands:
               source $BASH_ENV
 
               printf "%s Building image...\n" "$(TZ=UTC date)"
-              BUILD_TAG="$CIRCLE_SHA1" hokusai build
+              BUILD_TARGET="$BUILD_TARGET" BUILD_TAG="$CIRCLE_SHA1" hokusai build
               printf "%s Image built.\n" "$(TZ=UTC date)"
 
               printf "%s Pushing image...\n" "$(TZ=UTC date)"
@@ -84,7 +84,7 @@ commands:
           no_output_timeout: 15m
           command: |
             printf "%s Building image...\n" "$(TZ=UTC date)"
-            BUILD_TAG="$CIRCLE_SHA1" hokusai build
+            BUILD_TARGET="$BUILD_TARGET" BUILD_TAG="$CIRCLE_SHA1" hokusai build
             printf "%s Image built.\n" "$(TZ=UTC date)"
 
             printf "%s Pushing image...\n" "$(TZ=UTC date)"
