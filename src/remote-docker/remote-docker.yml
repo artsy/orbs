@@ -1,4 +1,4 @@
-# Orb Version 0.1.7
+# Orb Version 0.1.8
 
 version: 2.1
 description: >
@@ -64,7 +64,7 @@ commands:
               export HOKUSAI_ALWAYS_VERBOSE=1
 
               export TAG_LABEL=""
-              if ! -z "${BUILD_TARGET}"; then
+              if [ ! -z "${BUILD_TARGET}" ]; then
                 TAG_LABEL="-${BUILD_TARGET}"
               fi
               export BUILD_TAG="${CIRCLE_SHA1}${TAG_LABEL}"
@@ -92,7 +92,7 @@ commands:
               export HOKUSAI_ALWAYS_VERBOSE=1
 
               export TAG_LABEL=""
-              if ! -z "${BUILD_TARGET}"; then
+              if [ ! -z "${BUILD_TARGET}" ]; then
                 TAG_LABEL="-${BUILD_TARGET}"
               fi
               export BUILD_TAG="${CIRCLE_SHA1}${TAG_LABEL}"
