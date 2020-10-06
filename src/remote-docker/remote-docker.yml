@@ -1,4 +1,4 @@
-# Orb Version 0.1.8
+# Orb Version 0.1.9
 
 version: 2.1
 description: >
@@ -251,3 +251,26 @@ jobs:
           artsy_docker_port: << parameters.artsy_docker_port >>
           artsy_s3_path_root: << parameters.artsy_s3_path_root >>
       - buildkit-push-image-via-artsy
+
+  setup-remote:
+    executor: << parameters.executor >>
+    parameters:
+      executor:
+        type: executor
+        default: deploy
+      artsy_docker_host:
+        type: string
+        default: docker.artsy.net
+      artsy_docker_port:
+        type: integer
+        default: 2376
+      artsy_s3_path_root:
+        type: string
+        default: artsy-citadel/docker
+    steps:
+      - add_ssh_keys
+      - checkout
+      - setup-artsy-remote-docker:
+          artsy_docker_host: << parameters.artsy_docker_host >>
+          artsy_docker_port: << parameters.artsy_docker_port >>
+          artsy_s3_path_root: << parameters.artsy_s3_path_root >>
