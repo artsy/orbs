@@ -1,4 +1,4 @@
-# Orb Version 0.1.8
+# Orb Version 0.1.9
 
 version: 2.1
 description: >
@@ -8,9 +8,15 @@ executors:
   deploy:
     docker:
       - image: artsy/hokusai:0.5.11
+        auth:
+          username: $DOCKERHUB_USER
+          password: $DOCKERHUB_PASSWORD
   beta:
     docker:
       - image: artsy/hokusai:beta
+        auth:
+          username: $DOCKERHUB_USER
+          password: $DOCKERHUB_PASSWORD
 
 commands:
   setup-artsy-remote-docker:
