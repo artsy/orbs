@@ -39,14 +39,27 @@ commands:
     parameters:
       configUri:
         type: string
-        default: "https://artsy-provisioning-public.s3.amazonaws.com/hokusai/config-ci.yml"
+        # configure the default in the unless statement
+        default: ""
     steps:
-      - run:
-          name: Configure Hokusai
-          command: |
-            mkdir -p ~/.hokusai
-            curl -o ~/.hokusai/config.yml << parameters.configUri >>
-            hokusai configure
+      - when:
+          condition: << parameters.configUri >>
+          steps:
+            - run:
+                name: Configure Hokusai
+                command: |
+                  mkdir -p ~/.hokusai
+                  curl -o ~/.hokusai/config.yml << parameters.configUri >>
+                  hokusai configure
+      - unless:
+          condition: << parameters.configUri >>
+          steps:
+            - run:
+                name: Configure Hokusai
+                command: |
+                  mkdir -p ~/.hokusai
+                  curl -o ~/.hokusai/config.yml https://artsy-provisioning-public.s3.amazonaws.com/hokusai/config-ci.yml
+                  hokusai configure
 
   push-image:
     steps:
@@ -128,10 +141,14 @@ jobs:
         type: string
         description: How long to wait for shell output before timing out
         default: 20m
+      configUri:
+        type: string
+        default: ""
     steps:
       - setup
       - install-aws-iam-authenticator
-      - configure-hokusai
+      - configure-hokusai:
+          configUri: << parameters.configUri >>
       - run:
           name: Validate Kubernetes Yaml
           command: hokusai staging update --skip-checks --dry-run
@@ -153,10 +170,14 @@ jobs:
         type: string
         description: How long to wait for shell output before timing out
         default: 20m
+      configUri:
+        type: string
+        default: ""
     steps:
       - setup
       - install-aws-iam-authenticator
-      - configure-hokusai
+      - configure-hokusai:
+          configUri: << parameters.configUri >>
       - run:
           name: Validate Kubernetes Yaml
           command: hokusai production update --skip-checks --dry-run
