@@ -45,27 +45,29 @@ commands:
     parameters:
       configUri:
         type: string
-        # configure the default in the unless statement
+        # configure the default in DEFAULT_CONFIG_PATH
         default: ""
     steps:
-      - when:
-          condition: << parameters.configUri >>
-          steps:
-            - run:
-                name: Configure Hokusai
-                command: |
-                  mkdir -p ~/.hokusai
-                  curl -o ~/.hokusai/config.yml << parameters.configUri >>
-                  hokusai configure
-      - unless:
-          condition: << parameters.configUri >>
-          steps:
-            - run:
-                name: Configure Hokusai
-                command: |
-                  mkdir -p ~/.hokusai
-                  curl -o ~/.hokusai/config.yml https://artsy-provisioning-public.s3.amazonaws.com/hokusai/config-ci.yml
-                  hokusai configure
+      - run:
+          name: Configure Hokusai
+          # Order of precedence of config path:
+          #   1. parameter
+          #   2. environment variable
+          #   3. default
+          command: |
+            DEFAULT_CONFIG_PATH=https://artsy-provisioning-public.s3.amazonaws.com/hokusai/config-ci.yml
+
+            if [[ ! -z "<< parameters.configUri >>" ]]; then
+              CONFIG="<< parameters.configUri >>"
+            elif [[ ! -z "$HOKUSAI_CONFIG_PATH" ]]
+              CONFIG="$HOKUSAI_CONFIG_PATH"
+            else
+              CONFIG="$DEFAULT_CONFIG_PATH"
+            fi
+
+            mkdir -p ~/.hokusai
+            curl -o ~/.hokusai/config.yml "$CONFIG"
+            hokusai configure
 
   push-image:
     steps:
