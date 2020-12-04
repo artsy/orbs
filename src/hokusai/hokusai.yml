@@ -45,7 +45,7 @@ commands:
     parameters:
       configUri:
         type: string
-        default: "https://artsy-provisioning-public.s3.amazonaws.com/hokusai/config-ci-leo.yml"
+        default: "https://artsy-provisioning-public.s3.amazonaws.com/hokusai/config-ci-pictor.yml"
     steps:
       - run:
           name: Configure Hokusai
