@@ -26,7 +26,8 @@ commands:
   setup-docker:
     steps:
       - setup
-      - setup_remote_docker
+      - setup_remote_docker:
+        version: 19.03.13
 
   install-aws-iam-authenticator:
     parameters:
