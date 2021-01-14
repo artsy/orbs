@@ -65,7 +65,7 @@ commands:
         type: string
         default: 19.03.13
     steps:
-      - setup-docker
+      - setup-docker:
           remote_docker_version: << parameters.remote_docker_version >>
       - run:
           name: Push
@@ -121,7 +121,7 @@ jobs:
         default: 19.03.13
         description: specify circleci remote docker version
     steps:
-      - setup-docker
+      - setup-docker:
           remote_docker_version: << parameters.remote_docker_version >>
       - run-tests:
           filename: << parameters.filename >>
@@ -137,7 +137,7 @@ jobs:
         type: string
         default: 19.03.13
     steps:
-      - push-image
+      - push-image:
           remote_docker_version: << parameters.remote_docker_version >>
 
   deploy-staging:
