@@ -110,7 +110,7 @@ jobs:
         default: deploy
       filename:
         type: string
-        default: ./hokusai/test.yml
+        default: ./hokusai/test.yml.j2
         description: The docker-compose yaml file to use
       flags:
         type: string
