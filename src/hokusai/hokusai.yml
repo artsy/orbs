@@ -110,6 +110,7 @@ jobs:
         default: deploy
       filename:
         type: string
+        default: ""
         description: The docker-compose yaml file to use
       flags:
         type: string
