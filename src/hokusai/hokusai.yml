@@ -88,18 +88,14 @@ commands:
         default: ""
         description: Optional hokusai flags
     steps:
-      - when:
-          condition: << parameters.filename >>
-          steps:
-            - run:
-                name: Test
-                command: hokusai test -f << parameters.filename >> << parameters.flags >>
-      - unless:
-          condition: << parameters.filename >>
-          steps:
-            - run:
-                name: Test
-                command: hokusai test << parameters.flags >>
+      - run:
+          name: Test
+          command: |
+            if [ "<< parameters.filename >>" != "" ]; then
+              hokusai test -f << parameters.filename >> << parameters.flags >>
+            else
+              hokusai test << parameters.flags >>
+            fi
 
 jobs:
   test:
