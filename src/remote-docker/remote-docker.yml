@@ -82,8 +82,8 @@ commands:
               printf "%s Image built.\n" "$(TZ=UTC date)"
 
               printf "Skipping local docker build fallback...\n"
+              circleci step halt
             fi
-            circleci step halt
 
   buildkit-push-image-via-artsy:
     steps:
@@ -115,8 +115,8 @@ commands:
               printf "%s Image pushed.\n" "$(TZ=UTC date)"
 
               printf "Skipping local docker build fallback...\n"
+              circleci step halt
             fi
-            circleci step halt
 
   build-image-via-artsy:
     steps:
