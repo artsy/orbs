@@ -185,7 +185,7 @@ jobs:
     steps:
       - add_ssh_keys
       - checkout
-      - setup_remote_docker
+      - setup_remote_docker:
           version: 19.03.13
       - test
 
@@ -212,7 +212,7 @@ jobs:
           artsy_docker_port: << parameters.artsy_docker_port >>
           artsy_s3_path_root: << parameters.artsy_s3_path_root >>
       - build-image-via-artsy
-      - setup_remote_docker
+      - setup_remote_docker:
           version: 19.03.13
       - build-image-via-circle
 
