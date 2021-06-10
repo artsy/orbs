@@ -1,4 +1,4 @@
-# Orb Version 0.8.0
+# Orb Version 0.8.1
 
 version: 2.1
 description: Reusable hokusai tasks for managing deployments
@@ -191,3 +191,23 @@ jobs:
           name: Deploy
           command: hokusai pipeline promote --update-config
           no_output_timeout: << parameters.time-out >>
+
+  # for data jobs (e.g. fulcrum) that are run not in k8s (e.g. in jenkins).
+  deploy-staging-data-app:
+    executor: << parameters.executor >>
+    parameters:
+      executor:
+        type: executor
+        default: deploy
+      project-name:
+        type: string
+        description: The name of the project as it appears on github
+      time-out:
+        type: string
+        description: How long to wait for shell output before timing out
+        default: 20m
+    steps:
+      - setup
+      - run:
+          name: Update Staging Github Tag
+          command: git push git@github.com:artsy/<< parameters.project-name >>.git $CIRCLE_SHA1:refs/heads/staging --force
