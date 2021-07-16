@@ -43,24 +43,18 @@ commands:
       - add_ssh_keys
       - checkout
       - load_dependencies
-      - when:
-          condition: << pipeline.parameters.lerna-bootstrap >>
-          steps:
-            - run: yarn lerna bootstrap
-      - unless:
-          condition: << parameters.lerna-bootstrap >>
-          steps:
-            - install
+      - run:
+          name: Install or bootstrap as necessary
+          command: |
+            if [ -z "$(printenv $LERNA_BOOTSTRAP)" ]; then
+              yarn install
+            else
+              yarn lerna bootstrap
+            fi
 
   update_dependencies:
-    parameters:
-      bootstrap:
-        description: If lerna bootstrap should be ran prior to setup
-        type: boolean
-        default: false
     steps:
-      - setup:
-          bootstrap: << parameters.bootstrap >>
+      - setup
       - save_dependencies
 
   run-script:
@@ -199,15 +193,9 @@ jobs:
                 failure_message: $CIRCLE_PROJECT_REPONAME's tests failed for master
 
   update-cache:
-    parameters:
-      bootstrap:
-        description: If lerna bootstrap should be ran on setup
-        type: boolean
-        default: false
     executor: node/build
     steps:
-      - update_dependencies:
-          bootstrap: << parameters.bootstrap >>
+      - update_dependencies
 
   # A job responsible for ensuring only 1 master build runs at a time so that
   # there are no deployment race conditions
