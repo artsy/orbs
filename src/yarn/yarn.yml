@@ -1,4 +1,4 @@
-# Orb Version 5.1.3
+# Orb Version 5.2.0
 
 version: 2.1
 description: Common yarn commands
@@ -39,15 +39,33 @@ commands:
       - run: yarn
 
   setup:
+    parameters:
+      bootstrap:
+        description: If lerna bootstrap should be ran prior to setup
+        type: boolean
+        default: false
     steps:
       - add_ssh_keys
       - checkout
       - load_dependencies
-      - install
+      - when:
+          condition: << parameters.bootstrap >>
+          steps:
+            - run: yarn lerna bootstrap
+      - unless:
+          condition: << parameters.bootstrap >>
+          steps:
+            - install
 
   update_dependencies:
+    parameters:
+      bootstrap:
+        description: If lerna bootstrap should be ran prior to setup
+        type: boolean
+        default: false
     steps:
-      - setup
+      - setup:
+          bootstrap: << parameters.bootstrap >>
       - save_dependencies
 
   run-script:
@@ -186,9 +204,15 @@ jobs:
                 failure_message: $CIRCLE_PROJECT_REPONAME's tests failed for master
 
   update-cache:
+    parameters:
+      bootstrap:
+        description: If lerna bootstrap should be ran on setup
+        type: boolean
+        default: false
     executor: node/build
     steps:
-      - update_dependencies
+      - update_dependencies:
+          bootstrap: << parameters.bootstrap >>
 
   # A job responsible for ensuring only 1 master build runs at a time so that
   # there are no deployment race conditions
