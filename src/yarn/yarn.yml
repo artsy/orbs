@@ -1,4 +1,4 @@
-# Orb Version 5.1.3
+# Orb Version 5.2.0
 
 version: 2.1
 description: Common yarn commands
@@ -43,7 +43,14 @@ commands:
       - add_ssh_keys
       - checkout
       - load_dependencies
-      - install
+      - run:
+          name: Install or bootstrap as necessary
+          command: |
+            if [ -z "$(printenv $LERNA_BOOTSTRAP)" ]; then
+              yarn install
+            else
+              yarn lerna bootstrap
+            fi
 
   update_dependencies:
     steps:
