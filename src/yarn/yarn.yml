@@ -39,21 +39,16 @@ commands:
       - run: yarn
 
   setup:
-    parameters:
-      bootstrap:
-        description: If lerna bootstrap should be ran prior to setup
-        type: boolean
-        default: false
     steps:
       - add_ssh_keys
       - checkout
       - load_dependencies
       - when:
-          condition: << parameters.bootstrap >>
+          condition: << pipeline.parameters.lerna-bootstrap >>
           steps:
             - run: yarn lerna bootstrap
       - unless:
-          condition: << parameters.bootstrap >>
+          condition: << parameters.lerna-bootstrap >>
           steps:
             - install
 
