@@ -46,9 +46,10 @@ commands:
       - run:
           name: Install or bootstrap as necessary
           command: |
-            if [ -z "$(printenv $LERNA_BOOTSTRAP)" ]; then
+            if [ -z "$LERNA_BOOTSTRAP" ]; then
               yarn install
             else
+              yarn install
               yarn lerna bootstrap
             fi
 
