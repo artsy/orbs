@@ -14,7 +14,7 @@ jobs:
   publish:
     executor: node/build
     environment:
-      AUTO_VERSION: v9.27.2
+      AUTO_VERSION: << parameters.version >>
     parameters:
       version:
         type: string
@@ -24,13 +24,14 @@ jobs:
         default: ""
     steps:
       - yarn/pre-release
-      - auto/shipit
+      - auto/shipit:
+        arguments: << parameters.args >>
 
   # Publishes a canary package to npm
   publish-canary:
     executor: node/build
     environment:
-      AUTO_VERSION: v9.27.2
+      AUTO_VERSION: << parameters.version >>
     parameters:
       version:
         type: string
@@ -43,4 +44,5 @@ jobs:
           pr-skip-message: Skipping, only deploys canaries on PR builds
           fork-skip-message: Skipping, can't deploy canaries from a fork
       - yarn/pre-release
-      - auto/canary
+      - auto/canary:
+        arguments: << parameters.args >>
