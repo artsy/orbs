@@ -171,6 +171,7 @@ jobs:
         type: executor
         default: deploy
     steps:
+      - setup
       - run:
           name: retag staging
           command: hokusai registry retag staging foo
