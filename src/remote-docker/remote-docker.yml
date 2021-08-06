@@ -1,8 +1,8 @@
-# Orb Version 0.1.13
+# Orb Version 0.1.14
 
 version: 2.1
 description: >
-  Excute Docker build via Artsy-managed Docker daemon with a Circle CI fallback
+  Execute Docker build via Artsy-managed Docker daemon with a Circle CI fallback
 
 executors:
   deploy:
