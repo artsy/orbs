@@ -2,7 +2,7 @@
 
 version: 2.1
 description: >
-  Excute Docker build via Artsy-managed Docker daemon with a Circle CI fallback
+  Execute Docker build via Artsy-managed Docker daemon with a Circle CI fallback
 
 executors:
   deploy:
