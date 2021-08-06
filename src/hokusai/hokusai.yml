@@ -1,4 +1,4 @@
-# Orb Version 0.8.0
+# Orb Version 0.9.0
 
 version: 2.1
 description: Reusable hokusai tasks for managing deployments
@@ -163,6 +163,17 @@ jobs:
       - run:
           name: Update Staging branch
           command: git push git@github.com:artsy/<< parameters.project-name >>.git $CIRCLE_SHA1:refs/heads/staging --force
+
+  retag-staging:
+    executor: << parameters.executor >>
+    parameters:
+      executor:
+        type: executor
+        default: deploy
+    steps:
+      - run:
+          name: retag staging
+          command: hokusai registry retag staging foo
 
   deploy-production:
     executor: << parameters.executor >>
