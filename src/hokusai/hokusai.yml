@@ -174,7 +174,7 @@ jobs:
       - setup
       - run:
           name: retag staging
-          command: hokusai registry retag staging foo
+          command: hokusai registry retag staging $CIRCLE_SHA1
 
   deploy-production:
     executor: << parameters.executor >>
