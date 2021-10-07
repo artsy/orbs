@@ -1,4 +1,4 @@
-# Orb Version 1.4.0
+# Orb Version 2.0.0
 
 version: 2.1
 description: Publish NPM packages and canary deployments with Intuit's Auto
@@ -18,7 +18,7 @@ jobs:
     parameters:
       version:
         type: string
-        default: v9.27.2
+        default: v10.32.1
       args:
         type: string
         default: ""
@@ -35,7 +35,7 @@ jobs:
     parameters:
       version:
         type: string
-        default: v9.27.2
+        default: v10.32.1
       args:
         type: string
         default: ""
