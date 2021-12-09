@@ -6,7 +6,7 @@ description: Reusable hokusai tasks for managing deployments
 executors:
   deploy:
     docker:
-      - image: artsy/hokusai:0.5.16
+      - image: artsy/hokusai:0.5.18
         auth:
           username: $DOCKERHUB_USER
           password: $DOCKERHUB_PASSWORD
