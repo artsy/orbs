@@ -134,7 +134,7 @@ jobs:
         default: false
       notify_slack_on_failure:
         description: |
-          If a slack message should be sent out if master fails. Requires SLACK_WEBHOOK environment
+          If a slack message should be sent out if building off of main branch fails. Requires SLACK_WEBHOOK environment
           variable to be set.
         type: boolean
         default: false
@@ -154,17 +154,17 @@ jobs:
                   important_files_modified() {
                     FILES="yarn.lock << parameters.run_all_tests_if_these_files_change >>"
                     for file in ${FILES[@]}; do
-                      if ! git diff origin/master -s --exit-code $file; then
+                      if ! git diff origin/main -s --exit-code $file; then
                         return 0
                       fi
                     done
                     return 1
                   }
 
-                  if [[ "$(git rev-parse --abbrev-ref HEAD)" == "master" ]] || important_files_modified; then
+                  if [[ "$(git rev-parse --abbrev-ref HEAD)" == "main" ]] || important_files_modified; then
                     yarn jest --coverage --reporters=default --reporters=jest-junit << parameters.args >>
                   else
-                    yarn jest --coverage --changedSince=origin/master --reporters=default --reporters=jest-junit << parameters.args >>
+                    yarn jest --coverage --changedSince=origin/main --reporters=default --reporters=jest-junit << parameters.args >>
                   fi
       - unless:
           condition: << parameters.only_test_changed >>
@@ -182,22 +182,22 @@ jobs:
             - utils/skip-if-fork-or-not-pr
             - slack/status:
                 fail_only: true
-                only_for_branches: master
-                failure_message: $CIRCLE_PROJECT_REPONAME's tests failed for master
+                only_for_branches: main
+                failure_message: $CIRCLE_PROJECT_REPONAME's tests failed for main
 
   update-cache:
     executor: node/build
     steps:
       - update_dependencies
 
-  # A job responsible for ensuring only 1 master build runs at a time so that
+  # A job responsible for ensuring only 1 main build runs at a time so that
   # there are no deployment race conditions
   workflow-queue:
     executor: node/build
     steps:
       - queue/until_front_of_line:
           time: "2" # how long a queue will wait until the job exits
-          only-on-branch: master # restrict queueing to a specific branch (default *)
+          only-on-branch: main # restrict queueing to a specific branch (default *)
           consider-job: false # block whole workflow if any job still running
 
   release:

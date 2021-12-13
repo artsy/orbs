@@ -20,7 +20,7 @@ To make it easier to perform changes locally, it's recommended that you run `set
 
 ## Versioning
 
-Every orb has a comment like `# Orb Version 1.2.3` on the first line of the file. This comment is significant in that it's used to determine which version of the orb should be deployed (which will be discussed in the next section). Orbs in `master` will have a comment representing the currently deployed production version.
+Every orb has a comment like `# Orb Version 1.2.3` on the first line of the file. This comment is significant in that it's used to determine which version of the orb should be deployed (which will be discussed in the next section). Orbs in `main` will have a comment representing the currently deployed production version.
 
 When you make a change to an orb file you _must_ update the version. CI checks will fail otherwise.
 
@@ -29,9 +29,9 @@ When you make a change to an orb file you _must_ update the version. CI checks w
 There are two types of deployments that happen in this repo.
 
 1. Canary deployments that happen on every PR change
-2. Production deployments that happen when a PR is merged to master.
+2. Production deployments that happen when a PR is merged to main.
 
-When you make a change to an orb (and update the version) a canary version will be published. Check the build logs for the version name. This canary build can be used (before your PR is merged to master) to test orb changes in other projects. It's _highly_ recommended that you utilize this canary system to test changes that may impact many projects.
+When you make a change to an orb (and update the version) a canary version will be published. Check the build logs for the version name. This canary build can be used (before your PR is merged to main) to test orb changes in other projects. It's _highly_ recommended that you utilize this canary system to test changes that may impact many projects.
 
 Upon merging a PR, CI will publish the changed orbs to CircleCI's public registry. Artsy also has [renovate configuration](reno-config) to update orb changes across Artsy's GitHub org.
 

@@ -21,7 +21,7 @@ BRANCH=$(git branch | grep "\*" | cut -d ' ' -f2)
 ORB="$1"
 IS_CHANGED=$(is_orb_changed "$ORB")
 
-if [ "$BRANCH" != "master" ] && [ -z "$IS_CHANGED" ]; then
+if [ "$BRANCH" != "main" ] && [ -z "$IS_CHANGED" ]; then
   echo "$(YELLOW "[skipped]") Publish for $NAMESPACE/$ORB because there are no changes"
   exit 0
 fi
@@ -55,14 +55,14 @@ elif [ -z "$DRY_RUN" ]; then
   exit 1
 fi
 
-# Build the dev version prefix. When not on the master branch this will be
+# Build the dev version prefix. When not on the main branch this will be
 # used to publish a dev version of the orb. That can be pulled in using
 # $NAMESPACE/<orb-name>@dev:<version>. This is useful for testing purposes.
 #
 # This will be referred to as "dev mode" in later comments
 DEV=""
 VERSION_POSTFIX=""
-if [ "$BRANCH" != "master" ]; then
+if [ "$BRANCH" != "main" ]; then
   DEV="dev:"
   echo "$(YELLOW "[Running in dev mode]")"
 
@@ -141,7 +141,7 @@ if [ -z "$DRY_RUN" ] && [ -z "$DEV" ] && [ -n "$SLACK_WEBHOOK_URL" ]; then
   ./slack \
     -color "good" \
     -title "Circle CI $ORB orb v$VERSION published!" \
-    -title_link "${CIRCLE_BUILD_URL:-https://circleci.com/gh/$NAMESPACE/orbs/tree/master}" \
+    -title_link "${CIRCLE_BUILD_URL:-https://circleci.com/gh/$NAMESPACE/orbs/tree/main}" \
     -user_name "artsyit" \
     -icon_emoji ":crystal_ball:"
 

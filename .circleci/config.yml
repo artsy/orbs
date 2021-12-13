@@ -36,6 +36,6 @@ workflows:
           filters:
             branches:
               ignore:
-                - master
+                - main
       - publish_orbs:
           context: circleci-api
