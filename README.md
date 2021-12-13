@@ -10,7 +10,7 @@ CircleCI 2.1 introduces [several new features](https://github.com/CircleCI-Publi
 
 For more info on Orbs, checkout their [docs](https://github.com/CircleCI-Public/config-preview-sdk/tree/master/docs)!
 
-(The TL;DR is there's an `orb` yml configuration file that's used to share things like [executors](orb-executors), [commands](orb-commands), and [jobs](orb-jobs) across your CircleCi builds.)
+(The TL;DR is there's an `orb` yml configuration file that's used to share things like [executors][orb-executors], [commands][orb-commands], and [jobs][orb-jobs] across your CircleCi builds.)
 
 ## Getting Started
 
@@ -33,11 +33,11 @@ There are two types of deployments that happen in this repo.
 
 When you make a change to an orb (and update the version) a canary version will be published. Check the build logs for the version name. This canary build can be used (before your PR is merged to main) to test orb changes in other projects. It's _highly_ recommended that you utilize this canary system to test changes that may impact many projects.
 
-Upon merging a PR, CI will publish the changed orbs to CircleCI's public registry. Artsy also has [renovate configuration](reno-config) to update orb changes across Artsy's GitHub org.
+Upon merging a PR, CI will publish the changed orbs to CircleCI's public registry. Artsy also has [renovate configuration][reno-config] to update orb changes across Artsy's GitHub org.
 
 The deployment process is driven by a set of bash scripts in the `scripts` directory. `publish_orbs.sh` is responsible for publishing both the canary and release version of the orbs. It's heavily commented and you're encouraged to read through it if you're interested in how the process works.
 
 [orb-executors]: https://circleci.com/docs/2.0/reusing-config/#authoring-reusable-executors
 [orb-commands]: https://circleci.com/docs/2.0/reusing-config/#authoring-reusable-commands
 [orb-jobs]: https://circleci.com/docs/2.0/reusing-config/#authoring-reusable-commands
-[reno-config]: https://github.com/artsy/renovate-config/blob/f8d47916b38096ebf834985e926253dcc0f78e25/lib/config-builder.js#L55-L62
+[reno-config]: https://github.com/artsy/renovate-config/blob/1210eeba081c4aeb1369ed9257cbe7b1e76276e0/lib/config.js
