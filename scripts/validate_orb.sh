@@ -40,16 +40,16 @@ if [ -n "$IS_CREATED" ] && [ -n "$IS_PUBLISHED" ]; then
 
   PUBLISHED_VERSION=$(get_published_orb_version "$ORB")
   BRANCH=$(git rev-parse --abbrev-ref HEAD)
-  if [ "$BRANCH" != "master" ]; then
+  if [ "$BRANCH" != "main" ]; then
 
-    CHANGED_FILES="$(git diff --name-only HEAD..origin/master)"
+    CHANGED_FILES="$(git diff --name-only HEAD..origin/main)"
     UPDATED_FILES="$(git status -s | cut -c4-)"
     #shellcheck disable=SC2206
     ALL_CHANGES=(${CHANGED_FILES[@]} ${UPDATED_FILES[@]})
     for file in "${ALL_CHANGES[@]}"; do
       if [[ "$ORB_PATH" == *"$file" ]] && [[ "$VERSION" == "$PUBLISHED_VERSION" ]]; then
         echo ""
-        echo "$NAMESPACE/$ORB has been updated since master but hasn't had its version bumped."
+        echo "$NAMESPACE/$ORB has been updated since main but hasn't had its version bumped."
         echo "Update its version in $ORB_PATH"
         exit 1
       fi
