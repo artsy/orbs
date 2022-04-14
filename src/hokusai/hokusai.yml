@@ -184,7 +184,7 @@ jobs:
         default: deploy
       time-out:
         type: string
-        description: How long to wait for shell output before timing out
+        description: How long long to wait for shell output before timing out
         default: 20m
     steps:
       - setup
