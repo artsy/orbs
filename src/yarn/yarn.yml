@@ -1,13 +1,17 @@
-# Orb Version 6.1.0
+# Orb Version 6.2.0
 
 version: 2.1
 description: Common yarn commands
 
 orbs:
-  node: artsy/node@2.0.0
   queue: eddiewebb/queue@1.0.110
   slack: circleci/slack@3.4.2
   utils: artsy/orb-tools@0.5.0
+
+executors:
+  node:
+    docker:
+      - image: cimg/node:14.18.1
 
 commands:
   # https://circleci.com/docs/2.0/caching/#basic-example-of-dependency-caching
@@ -77,7 +81,7 @@ commands:
 
 jobs:
   run:
-    executor: node/build
+    executor: node
     parameters:
       script:
         type: string
@@ -86,25 +90,25 @@ jobs:
           script: << parameters.script >>
 
   lint:
-    executor: node/build
+    executor: node
     steps:
       - run-script:
           script: lint
 
   relay:
-    executor: node/build
+    executor: node
     steps:
       - run-script:
           script: relay
 
   type-check:
-    executor: node/build
+    executor: node
     steps:
       - run-script:
           script: type-check
 
   test:
-    executor: node/build
+    executor: node
     parameters:
       args:
         type: string
@@ -114,7 +118,7 @@ jobs:
           script: test << parameters.args >>
 
   jest:
-    executor: node/build
+    executor: node
     environment:
       JEST_JUNIT_OUTPUT_DIR: "reports/junit/js-test-results.xml"
     parameters:
@@ -186,14 +190,14 @@ jobs:
                 failure_message: $CIRCLE_PROJECT_REPONAME's tests failed for main
 
   update-cache:
-    executor: node/build
+    executor: node
     steps:
       - update_dependencies
 
   # A job responsible for ensuring only 1 main build runs at a time so that
   # there are no deployment race conditions
   workflow-queue:
-    executor: node/build
+    executor: node
     steps:
       - queue/until_front_of_line:
           time: "2" # how long a queue will wait until the job exits
@@ -201,6 +205,6 @@ jobs:
           consider-job: false # block whole workflow if any job still running
 
   release:
-    executor: node/build
+    executor: node
     steps:
       - run-release
