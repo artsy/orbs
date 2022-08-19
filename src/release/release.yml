@@ -1,4 +1,4 @@
-# Orb Version 0.0.1
+# Orb Version 0.0.2
 
 version: 2.1
 description: Wrapper for Artsy's release management tools
@@ -7,6 +7,9 @@ executors:
   scripts:
     docker:
       - image: artsy/orb-scripts
+        auth:
+          username: $DOCKERHUB_USER
+          password: $DOCKERHUB_PASSWORD
 
 jobs:
   block:
