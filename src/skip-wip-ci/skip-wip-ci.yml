@@ -1,4 +1,4 @@
-# Orb Version 0.3.0
+# Orb Version 0.4.0
 
 version: 2.1
 description: 'Use to skip CI when PR title contains "[wip]", "[skip ci]", "[ci skip]" or is draft'
@@ -137,22 +137,27 @@ commands:
 
             exit 0
 
-jobs:
-  check-skippable-pr:
+executors:
+  alpine:
     docker:
       - image: alpine:3.7
+        auth:
+          username: $DOCKERHUB_USER
+          password: $DOCKERHUB_PASSWORD
+
+jobs:
+  check-skippable-pr:
+    executor: alpine
     steps:
       - check-skippable-pr
 
   check-skippable-commit:
-    docker:
-      - image: alpine:3.7
+    executor: alpine
     steps:
       - check-skippable-commit
 
   check-skippable-ci:
-    docker:
-      - image: alpine:3.7
+    executor: alpine
     steps:
       - check-skippable-commit
       - check-skippable-pr

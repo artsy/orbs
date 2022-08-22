@@ -1,4 +1,4 @@
-# Orb Version 0.5.0
+# Orb Version 0.7.0
 
 version: 2.1
 description: A simple set of tools for managing orbs by Artsy
@@ -7,6 +7,9 @@ executors:
   orb-scripts:
     docker:
       - image: artsy/orb-scripts
+        auth:
+          username: $DOCKERHUB_USER
+          password: $DOCKERHUB_PASSWORD
 
 commands:
   check-for-env-vars:
@@ -56,7 +59,7 @@ commands:
       - run:
           name: Set orb scripts path
           command: |
-            if [ ! -d "./scripts" ]; then 
+            if [ ! -d "./scripts" ]; then
               ln -s /tmp/orb-scripts scripts
             fi
 
