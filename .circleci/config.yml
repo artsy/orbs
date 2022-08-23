@@ -4,6 +4,9 @@ executors:
   cli:
     docker:
       - image: circleci/circleci-cli
+        auth:
+          username: $DOCKERHUB_USER
+          password: $DOCKERHUB_PASSWORD
 
 jobs:
   validate_orbs:
@@ -32,10 +35,14 @@ workflows:
   build:
     jobs:
       - validate_orbs:
-          context: circleci-api
+          context:
+            - circleci-api
+            - docker-hub-creds
           filters:
             branches:
               ignore:
                 - main
       - publish_orbs:
-          context: circleci-api
+          context:
+            - circleci-api
+            - docker-hub-creds
