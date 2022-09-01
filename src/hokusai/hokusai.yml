@@ -27,7 +27,7 @@ commands:
     parameters:
       remote_docker_version:
         type: string
-        default: 19.03.13
+        default: 20.10.14
     steps:
       - setup
       - setup_remote_docker:
@@ -63,7 +63,7 @@ commands:
     parameters:
       remote_docker_version:
         type: string
-        default: 19.03.13
+        default: 20.10.14
     steps:
       - setup-docker:
           remote_docker_version: << parameters.remote_docker_version >>
@@ -114,7 +114,7 @@ jobs:
         description: Optional hokusai flags
       remote_docker_version:
         type: string
-        default: 19.03.13
+        default: 20.10.14
         description: specify circleci remote docker version
     steps:
       - setup-docker:
@@ -131,7 +131,7 @@ jobs:
         default: deploy
       remote_docker_version:
         type: string
-        default: 19.03.13
+        default: 20.10.14
     steps:
       - push-image:
           remote_docker_version: << parameters.remote_docker_version >>
