@@ -1,4 +1,4 @@
-# Orb Version 0.1.15
+# Orb Version 0.1.16
 
 version: 2.1
 description: >
@@ -75,8 +75,6 @@ commands:
               fi
               export BUILD_TAG="${CIRCLE_SHA1}${TAG_LABEL}"
 
-              echo "dockerd.buildkit:1|c" | nc -w 1 -u velocity.artsy.net 8125 || true
-
               printf "%s Building image...\n" "$(TZ=UTC date)"
               BUILD_TARGET="$BUILD_TARGET" BUILD_TAG="${BUILD_TAG}" hokusai build
               printf "%s Image built.\n" "$(TZ=UTC date)"
@@ -126,8 +124,6 @@ commands:
           command: |
             if test -f "$BASH_ENV"; then
               source $BASH_ENV
-
-              echo "dockerd.legacy:1|c" | nc -w 1 -u velocity.artsy.net 8125 || true
 
               printf "%s Building image...\n" "$(TZ=UTC date)"
               BUILD_TARGET="$BUILD_TARGET" BUILD_TAG="$CIRCLE_SHA1" hokusai build
