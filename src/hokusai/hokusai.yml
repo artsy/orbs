@@ -116,7 +116,6 @@ jobs:
           name: buildkit-build
           no_output_timeout: 15m
           command: |
-            set +euo pipefail
             if test -f "$BASH_ENV"; then
               source $BASH_ENV
 
@@ -153,7 +152,6 @@ jobs:
           name: buildkit push
           no_output_timeout: 15m
           command: |
-            set +euo pipefail
             if test -f "$BASH_ENV"; then
               source $BASH_ENV
 
