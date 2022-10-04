@@ -99,6 +99,86 @@ commands:
             fi
 
 jobs:
+
+  buildkit-build:
+    executor: << parameters.executor >>
+    parameters:
+      executor:
+        type: executor
+        default: deploy
+      remote_docker_version:
+        type: string
+        default: 20.10.14
+    steps:
+      - setup-docker:
+          remote_docker_version: << parameters.remote_docker_version >>
+      - run:
+          name: buildkit-build
+          no_output_timeout: 15m
+          command: |
+            set +euo pipefail
+            if test -f "$BASH_ENV"; then
+              source $BASH_ENV
+
+              export DOCKER_BUILDKIT=1
+              export BUILDKIT_PROGRESS=plain
+              export COMPOSE_DOCKER_CLI_BUILD=1
+              export HOKUSAI_ALWAYS_VERBOSE=1
+
+              export TAG_LABEL=""
+              if [ ! -z "${BUILD_TARGET}" ]; then
+                TAG_LABEL="-${BUILD_TARGET}"
+              fi
+              export BUILD_TAG="${CIRCLE_SHA1}${TAG_LABEL}"
+
+              printf "%s Building image...\n" "$(TZ=UTC date)"
+              BUILD_TARGET="$BUILD_TARGET" BUILD_TAG="${BUILD_TAG}" hokusai build
+              printf "%s Image built.\n" "$(TZ=UTC date)"
+            fi
+            circleci step halt
+
+  buildkit-push:
+    executor: << parameters.executor >>
+    parameters:
+      executor:
+        type: executor
+        default: deploy
+      remote_docker_version:
+        type: string
+        default: 20.10.14
+    steps:
+      - setup-docker:
+          remote_docker_version: << parameters.remote_docker_version >>
+      - run:
+          name: buildkit push
+          no_output_timeout: 15m
+          command: |
+            set +euo pipefail
+            if test -f "$BASH_ENV"; then
+              source $BASH_ENV
+
+              export DOCKER_BUILDKIT=1
+              export BUILDKIT_PROGRESS=plain
+              export COMPOSE_DOCKER_CLI_BUILD=1
+              export HOKUSAI_ALWAYS_VERBOSE=1
+
+              export TAG_LABEL=""
+              if [ ! -z "${BUILD_TARGET}" ]; then
+                TAG_LABEL="-${BUILD_TARGET}"
+              fi
+              export BUILD_TAG="${CIRCLE_SHA1}${TAG_LABEL}"
+
+              printf "%s Pushing image...\n" "$(TZ=UTC date)"
+              hokusai registry push \
+                --no-build \
+                --local-tag="${BUILD_TAG}" \
+                --tag="${BUILD_TAG}" \
+                --overwrite \
+                --skip-latest
+              printf "%s Image pushed.\n" "$(TZ=UTC date)"
+            fi
+            circleci step halt
+
   test:
     executor: << parameters.executor >>
     parameters:
