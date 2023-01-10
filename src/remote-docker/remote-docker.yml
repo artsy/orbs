@@ -1,4 +1,4 @@
-# Orb Version 0.1.16
+# Orb Version 0.1.17
 
 version: 2.1
 description: >
@@ -199,7 +199,7 @@ jobs:
         default: 2376
       artsy_s3_path_root:
         type: string
-        default: artsy-citadel/docker
+        default: artsy-dockerd
     steps:
       - add_ssh_keys
       - checkout
@@ -226,7 +226,7 @@ jobs:
         default: 2376
       artsy_s3_path_root:
         type: string
-        default: artsy-citadel/docker
+        default: artsy-dockerd
     steps:
       - add_ssh_keys
       - checkout
@@ -250,7 +250,7 @@ jobs:
         default: 2376
       artsy_s3_path_root:
         type: string
-        default: artsy-citadel/docker
+        default: artsy-dockerd
     steps:
       - add_ssh_keys
       - checkout
