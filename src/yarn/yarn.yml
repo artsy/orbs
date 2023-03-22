@@ -1,4 +1,4 @@
-# Orb Version 6.4.0
+# Orb Version 6.5.0
 
 version: 2.1
 description: Common yarn commands
@@ -11,7 +11,7 @@ orbs:
 executors:
   node:
     docker:
-      - image: cimg/node:14.18.1
+      - image: cimg/node:18.15.0
 
 commands:
   # https://circleci.com/docs/2.0/caching/#basic-example-of-dependency-caching
