@@ -47,10 +47,10 @@ fi
 
 # Build CircleCI token argument
 TOKEN=""
-if [ -n "${CIRCLECI_API_KEY:-}" ]; then
-  TOKEN="--token $CIRCLECI_API_KEY"
+if [ -n "${CIRCLE_TOKEN:-}" ]; then
+  TOKEN="--token $CIRCLE_TOKEN"
 elif [ -z "$DRY_RUN" ]; then
-  echo "$(RED "Must provide CIRCLECI_API_KEY env var")"
+  echo "$(RED "Must provide CIRCLE_TOKEN env var")"
   echo ""
   exit 1
 fi
