@@ -3,7 +3,7 @@ version: 2.1
 executors:
   cli:
     docker:
-      - image: circleci/circleci-cli
+      - image: circleci/circleci-cli:0.1.25725
 
 jobs:
   validate_orbs:
