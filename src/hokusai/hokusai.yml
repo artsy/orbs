@@ -173,7 +173,7 @@ jobs:
       - git-push-staging-branch-command:
           project-name: << parameters.project-name >>
 
-  git-push-staging-branch-job:
+  git-push-staging-branch:
     executor: << parameters.executor >>
     parameters:
       executor:
