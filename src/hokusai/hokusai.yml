@@ -1,4 +1,4 @@
-# Orb Version 0.12.0
+# Orb Version 0.13.0
 
 version: 2.1
 description: Reusable hokusai tasks for managing deployments
@@ -97,6 +97,16 @@ commands:
               hokusai test << parameters.flags >>
             fi
 
+  git-push-staging-branch-command:
+    parameters:
+      project-name:
+        type: string
+        description: The name of the project as it appears on github
+    steps:
+      - run:
+          name: Git Push Staging Branch
+          command: git push git@github.com:artsy/<< parameters.project-name >>.git $CIRCLE_SHA1:refs/heads/staging --force
+
 jobs:
   test:
     executor: << parameters.executor >>
@@ -160,9 +170,22 @@ jobs:
           name: Deploy
           command: hokusai staging deploy $CIRCLE_SHA1 --update-config
           no_output_timeout: << parameters.time-out >>
-      - run:
-          name: Update Staging branch
-          command: git push git@github.com:artsy/<< parameters.project-name >>.git $CIRCLE_SHA1:refs/heads/staging --force
+      - git-push-staging-branch-command:
+          project-name: << parameters.project-name >>
+
+  git-push-staging-branch-job:
+    executor: << parameters.executor >>
+    parameters:
+      executor:
+        type: executor
+        default: deploy
+      project-name:
+        type: string
+        description: The name of the project as it appears on github
+    steps:
+      - setup
+      - git-push-staging-branch-command:
+          project-name: << parameters.project-name >>
 
   retag-staging:
     executor: << parameters.executor >>
