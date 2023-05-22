@@ -1,4 +1,4 @@
-# Orb Version 0.1.18
+# Orb Version 0.1.19
 
 version: 2.1
 description: >
@@ -113,6 +113,7 @@ commands:
                   --tag="${BUILD_TAG}" \
                   --skip-latest
                 printf "%s Image pushed.\n" "$(TZ=UTC date)"
+              fi
 
               printf "Skipping local docker build fallback...\n"
             fi
@@ -169,6 +170,7 @@ commands:
                 --tag="$CIRCLE_SHA1" \
                 --skip-latest
               printf "%s Image pushed.\n" "$(TZ=UTC date)"
+            fi
 
   test:
     steps:
