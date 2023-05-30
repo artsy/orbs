@@ -1,4 +1,5 @@
-# Orb Version 0.13.0
+# Orb Version 0.14.0
+
 
 version: 2.1
 description: Reusable hokusai tasks for managing deployments
@@ -71,9 +72,8 @@ commands:
           name: Push
           command: |
             set +euo pipefail
-            if hokusai registry images --limit 1000 | grep -q $CIRCLE_SHA1; then
-              echo "Skipping push as the tag $CIRCLE_SHA1 already exists in the Docker registry"
-            else
+            if hokusai registry images --limit 1000 | grep $CIRCLE_SHA1 >/dev/null; then
+              echo "Skipping push as the tag $CIRCLE_SHA1 already exists in the Docker registry" else
               hokusai registry push --tag $CIRCLE_SHA1
             fi
 

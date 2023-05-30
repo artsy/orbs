@@ -1,4 +1,4 @@
-# Orb Version 0.1.19
+# Orb Version 0.1.20
 
 version: 2.1
 description: >
@@ -101,9 +101,10 @@ commands:
               if [ ! -z "${BUILD_TARGET}" ]; then
                 TAG_LABEL="-${BUILD_TARGET}"
               fi
+
               export BUILD_TAG="${CIRCLE_SHA1}${TAG_LABEL}"
 
-              if hokusai registry images --limit 1000 | grep -q $CIRCLE_SHA1; then
+              if hokusai registry images --limit 1000 | grep $BUILD_TAG >/dev/null; then
                 echo "Skipping push as the tag $BUILD_TAG already exists in the Docker registry"
               else
                 printf "%s Pushing image...\n" "$(TZ=UTC date)"
@@ -129,17 +130,19 @@ commands:
               source $BASH_ENV
 
               printf "%s Building image...\n" "$(TZ=UTC date)"
-              BUILD_TARGET="$BUILD_TARGET" BUILD_TAG="$CIRCLE_SHA1" hokusai build
+              export BUILD_TARGET="$BUILD_TARGET"
+              export BUILD_TAG="$CIRCLE_SHA1"
+              hokusai build
               printf "%s Image built.\n" "$(TZ=UTC date)"
 
-              if hokusai registry images --limit 1000 | grep -q $CIRCLE_SHA1; then
-                echo "Skipping push as the tag $CIRCLE_SHA1 already exists in the Docker registry"
+              if hokusai registry images --limit 1000 | grep $BUILD_TAG >/dev/null; then
+                echo "Skipping push as the tag $BUILD_TAG already exists in the Docker registry"
               else
                 printf "%s Pushing image...\n" "$(TZ=UTC date)"
                 hokusai registry push \
                   --no-build \
-                  --local-tag="$CIRCLE_SHA1" \
-                  --tag="$CIRCLE_SHA1" \
+                  --local-tag="$BUILD_TAG" \
+                  --tag="$BUILD_TAG" \
                   --skip-latest
                 printf "%s Image pushed.\n" "$(TZ=UTC date)"
               fi
@@ -157,17 +160,19 @@ commands:
           no_output_timeout: 15m
           command: |
             printf "%s Building image...\n" "$(TZ=UTC date)"
-            BUILD_TARGET="$BUILD_TARGET" BUILD_TAG="$CIRCLE_SHA1" hokusai build
+            export BUILD_TARGET="$BUILD_TARGET"
+            export BUILD_TAG="$CIRCLE_SHA1"
+            hokusai build
             printf "%s Image built.\n" "$(TZ=UTC date)"
 
-            if hokusai registry images --limit 1000 | grep -q $CIRCLE_SHA1; then
-              echo "Skipping push as the tag $CIRCLE_SHA1 already exists in the Docker registry"
+            if hokusai registry images --limit 1000 | grep $BUILD_TAG >/dev/null; then
+              echo "Skipping push as the tag $BUILD_TAG already exists in the Docker registry"
             else
               printf "%s Pushing image...\n" "$(TZ=UTC date)"
               hokusai registry push \
                 --no-build \
-                --local-tag="$CIRCLE_SHA1" \
-                --tag="$CIRCLE_SHA1" \
+                --local-tag="$BUILD_TAG" \
+                --tag="$BUILD_TAG" \
                 --skip-latest
               printf "%s Image pushed.\n" "$(TZ=UTC date)"
             fi
