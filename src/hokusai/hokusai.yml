@@ -1,4 +1,4 @@
-# Orb Version 0.16.0
+# Orb Version 0.17.0
 
 
 version: 2.1
@@ -73,7 +73,7 @@ commands:
           command: |
             set +euo pipefail
 
-            if hokusai registry images --limit 1000 | grep -E "$CIRCLE_SHA1([, ]|$)" >/dev/null
+            if hokusai registry images --tag-exists "$CIRCLE_SHA1" >/dev/null
             then
               echo "Skipping push as the tag $CIRCLE_SHA1 already exists in the Docker registry"
             else
