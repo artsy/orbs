@@ -104,7 +104,7 @@ commands:
 
               export BUILD_TAG="${CIRCLE_SHA1}${TAG_LABEL}"
 
-              if hokusai registry images --limit 1000 | grep "$BUILD_TAG" | grep -v "${BUILD_TAG}-" >/dev/null
+              if hokusai registry images --limit 1000 | grep -E "$BUILD_TAG([, ]|$)" >/dev/null
               then
                 echo "Skipping push as the tag $BUILD_TAG already exists in the Docker registry"
               else
@@ -136,7 +136,7 @@ commands:
               hokusai build
               printf "%s Image built.\n" "$(TZ=UTC date)"
 
-              if hokusai registry images --limit 1000 | grep "$BUILD_TAG" | grep -v "${BUILD_TAG}-" >/dev/null
+              if hokusai registry images --limit 1000 | grep -E "$BUILD_TAG([, ]|$)" >/dev/null
               then
                 echo "Skipping push as the tag $BUILD_TAG already exists in the Docker registry"
               else
@@ -167,7 +167,7 @@ commands:
             hokusai build
             printf "%s Image built.\n" "$(TZ=UTC date)"
 
-            if hokusai registry images --limit 1000 | grep "$BUILD_TAG" | grep -v "${BUILD_TAG}-" >/dev/null
+            if hokusai registry images --limit 1000 | grep -E "$BUILD_TAG([, ]|$)" >/dev/null
             then
               echo "Skipping push as the tag $BUILD_TAG already exists in the Docker registry"
             else
