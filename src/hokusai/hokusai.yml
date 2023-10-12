@@ -56,9 +56,19 @@ commands:
       - run:
           name: Configure Hokusai
           command: |
-            mkdir -p ~/.hokusai
-            curl -o ~/.hokusai/config.yml << parameters.configUri >>
-            hokusai configure
+            # sed removes color code from hokusai output
+            version=$(hokusa version | sed "s,\x1B\[[0-9;]*[a-zA-Z],,g")
+            echo "hokusai version: $version"
+            major=${version:0:1}
+
+            if [ "$major" -lt "2" ]
+            then
+              mkdir -p ~/.hokusai
+              curl -o ~/.hokusai/config.yml << parameters.configUri >>
+              hokusai configure
+            else
+              HOKUSAI_GLOBAL_CONFIG=s3://artsy-provisioning-public/hokusai/config-ci.yml hokusai configure
+            fi
 
   push-image:
     parameters:
