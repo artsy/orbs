@@ -57,7 +57,7 @@ commands:
           name: Configure Hokusai
           command: |
             # sed removes color code from hokusai output
-            version=$(hokusa version | sed "s,\x1B\[[0-9;]*[a-zA-Z],,g")
+            version=$(hokusai version | sed "s,\x1B\[[0-9;]*[a-zA-Z],,g")
             echo "hokusai version: $version"
             major=${version:0:1}
 
