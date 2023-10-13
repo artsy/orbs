@@ -62,7 +62,7 @@ commands:
             then
               # kubectl_version_option is null, --help has no kubectl-version option
               echo "New Hokusai configure command."
-              HOKUSAI_GLOBAL_CONFIG=s3://artsy-provisioning-public/hokusai/config-ci.yml hokusai configure
+              HOKUSAI_GLOBAL_CONFIG=s3://artsy-provisioning-public/hokusai/hokusai-ci.yml hokusai configure
             else
               echo "Old Hokusai configure command."
               mkdir -p ~/.hokusai
