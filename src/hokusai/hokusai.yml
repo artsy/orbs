@@ -1,4 +1,4 @@
-# Orb Version 0.19.0
+# Orb Version 0.20.0
 
 
 version: 2.1
@@ -57,7 +57,7 @@ commands:
           name: Configure Hokusai
           command: |
             # configure differently for old/new configure command
-            kubectl_version_option=$(hokusai configure --help | grep kubectl-version)
+            kubectl_version_option=$(hokusai configure --help | { grep kubectl-version || true; })
             if [ -z "$kubectl_version_option" ]
             then
               # kubectl_version_option is null, --help has no kubectl-version option
