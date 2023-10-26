@@ -1,4 +1,4 @@
-# Orb Version 0.20.0
+# Orb Version 0.21.0
 
 
 version: 2.1
@@ -51,24 +51,12 @@ commands:
     parameters:
       configUri:
         type: string
-        default: "https://artsy-provisioning-public.s3.amazonaws.com/hokusai/config-ci.yml"
+        default: "s3://artsy-provisioning-public/hokusai/hokusai-ci.yml"
     steps:
       - run:
           name: Configure Hokusai
           command: |
-            # configure differently for old/new configure command
-            kubectl_version_option=$(hokusai configure --help | { grep kubectl-version || true; })
-            if [ -z "$kubectl_version_option" ]
-            then
-              # kubectl_version_option is null, --help has no kubectl-version option
-              echo "New Hokusai configure command."
-              HOKUSAI_GLOBAL_CONFIG=s3://artsy-provisioning-public/hokusai/hokusai-ci.yml hokusai configure
-            else
-              echo "Old Hokusai configure command."
-              mkdir -p ~/.hokusai
-              curl -o ~/.hokusai/config.yml << parameters.configUri >>
-              hokusai configure
-            fi
+            HOKUSAI_GLOBAL_CONFIG=<< parameters.configUri >> hokusai configure
 
   push-image:
     parameters:
