@@ -2,6 +2,8 @@
 
 CircleCI orbs used at Artsy
 
+⚠️ [`artsy/yarn`](https://github.com/artsy/orbs/tree/main/src/yarn) has now been deprecated in favor of [`circleci/node`](https://circleci.com/developer/orbs/orb/circleci/node). Please use that for all Node.js-based CI needs.
+
 ## What's an Orb?
 
 > Orbs are packages of CircleCI configuration that can be shared across projects. Orbs allow you to make a single bundle of jobs, commands, and executors that can reference each other and can be imported into a CircleCI build configuration and invoked in their own namespace. Orbs are registered with CircleCI, with revisions expressed using the semver pattern.
