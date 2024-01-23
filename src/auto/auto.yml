@@ -1,6 +1,6 @@
-# Orb Version 2.1.0
+# Orb Version 2.2.0
 
-version: 2.1
+version: 2.2
 description: "Publish NPM packages and canary deployments with Intuit's Auto"
 orbs:
   yarn: artsy/yarn@5.1.3
