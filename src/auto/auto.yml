@@ -10,22 +10,31 @@ orbs:
 
 executors:
   node:
+    parameters:
+      node-version:
+        type: string
+        default: "14.18.1"
     docker:
-      - image: cimg/node:14.18.1
+      - image: cimg/node:<< parameters.node-version >>
 
 jobs:
   # Publishes a package to NPM
   publish:
-    executor: node
-    environment:
-      AUTO_VERSION: << parameters.version >>
     parameters:
+      node-version:
+        type: string
+        default: "14.18.1"
       version:
         type: string
         default: v10.36.5
       args:
         type: string
         default: ""
+    executor:
+      name: node
+      node-version: << parameters.node-version >>
+    environment:
+      AUTO_VERSION: << parameters.version >>
     steps:
       - yarn/pre-release
       - auto/shipit:
@@ -33,16 +42,21 @@ jobs:
 
   # Publishes a canary package to npm
   publish-canary:
-    executor: node
-    environment:
-      AUTO_VERSION: << parameters.version >>
     parameters:
+      node-version:
+        type: string
+        default: "14.18.1"
       version:
         type: string
         default: v10.36.5
       args:
         type: string
         default: ""
+    executor:
+      name: node
+      node-version: << parameters.node-version >>
+    environment:
+      AUTO_VERSION: << parameters.version >>
     steps:
       - utils/skip-if-fork-or-not-pr:
           pr-skip-message: Skipping, only deploys canaries on PR builds
