@@ -1,52 +1,60 @@
-# Orb Version 2.1.0
+# Orb Version 2.2.0
 
 version: 2.1
 description: Publish NPM packages and canary deployments with Intuit's Auto
-
 orbs:
   yarn: artsy/yarn@5.1.3
   auto: auto/release@0.2.3
   utils: artsy/orb-tools@0.5.0
-
 executors:
   node:
-    docker:
-      - image: cimg/node:14.18.1
-
-jobs:
-  # Publishes a package to NPM
-  publish:
-    executor: node
-    environment:
-      AUTO_VERSION: << parameters.version >>
     parameters:
+      node-version:
+        type: string
+        default: "14.18.1"
+    docker:
+      - image: cimg/node:<< parameters.node-version >>
+jobs:
+  publish:
+    parameters:
+      node-version:
+        type: string
+        default: "14.18.1"
       version:
         type: string
         default: v10.36.5
       args:
         type: string
         default: ""
+    executor:
+      name: node
+      node-version: << parameters.node-version >>
+    environment:
+      AUTO_VERSION: << parameters.version >>
     steps:
       - yarn/pre-release
       - auto/shipit:
-        arguments: << parameters.args >>
-
-  # Publishes a canary package to npm
+          arguments: << parameters.args >>
   publish-canary:
-    executor: node
-    environment:
-      AUTO_VERSION: << parameters.version >>
     parameters:
+      node-version:
+        type: string
+        default: "14.18.1"
       version:
         type: string
         default: v10.36.5
       args:
         type: string
         default: ""
+    executor:
+      name: node
+      node-version: << parameters.node-version >>
+    environment:
+      AUTO_VERSION: << parameters.version >>
     steps:
       - utils/skip-if-fork-or-not-pr:
           pr-skip-message: Skipping, only deploys canaries on PR builds
           fork-skip-message: Skipping, can't deploy canaries from a fork
       - yarn/pre-release
       - auto/canary:
-        arguments: << parameters.args >>
+          arguments: << parameters.args >>
