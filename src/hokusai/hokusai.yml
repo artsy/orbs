@@ -1,7 +1,7 @@
 # Orb Version 0.23.0
 
 
-version: 2.2
+version: 2.1
 description: Reusable hokusai tasks for managing deployments
 
 executors:
