@@ -1,3 +1,3 @@
-FROM circleci/circleci-cli:0.1.5691-alpine
+FROM circleci/circleci-cli:alpine
 COPY ./scripts /tmp/orb-scripts
 RUN apk add --no-cache bash git curl jq
