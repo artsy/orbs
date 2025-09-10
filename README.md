@@ -20,6 +20,27 @@ Orb files are stored in `src/<orb-name>/<orb-name>.yml`. The nested directory is
 
 To make it easier to perform changes locally, it's recommended that you run `setup.sh` in the root. This will setup the tools you need to be able to run circle commands locally along with some helpful pre-commit hooks.
 
+### Development Workflow
+
+1. **Setup**: Run `./setup.sh` to install CircleCI CLI and pre-commit hooks
+2. **Edit orb**: Modify files in `src/<orb-name>/<orb-name>.yml`
+3. **Update version**: Bump the version comment at the top of the orb file
+4. **Validate**: Run `NAMESPACE=artsy ./scripts/validate_orb.sh <orb-name>` to check syntax and versioning
+5. **Test**: Use canary builds (published automatically on PR) to test in other projects before merging
+
+### Common Commands
+
+```bash
+# Validate a specific orb (required before committing)
+NAMESPACE=artsy ./scripts/validate_orb.sh hokusai
+
+# Validate all orbs
+NAMESPACE=artsy ./scripts/validate_orbs.sh
+
+# Local dry-run publish (won't actually publish)
+NAMESPACE=artsy ./scripts/publish_orb.sh hokusai
+```
+
 ## Versioning
 
 Every orb has a comment like `# Orb Version 1.2.3` on the first line of the file. This comment is significant in that it's used to determine which version of the orb should be deployed (which will be discussed in the next section). Orbs in `main` will have a comment representing the currently deployed production version.
