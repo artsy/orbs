@@ -293,33 +293,3 @@ jobs:
             fi
             hokusai pipeline promote --update-config
           no_output_timeout: << parameters.time-out >>
-
-  test-working-directory:
-    executor: << parameters.executor >>
-    parameters:
-      executor:
-        type: executor
-        default: deploy
-      working-directory:
-        type: string
-        default: ""
-        description: Optional working directory for hokusai commands
-    steps:
-      - checkout
-      - run:
-          name: Test working directory
-          command: |
-            echo "=== Working Directory Test ==="
-            echo "PWD: $(pwd)"
-            echo "Expected working directory: << parameters.working-directory >>"
-            if [ "<< parameters.working-directory >>" != "" ]; then
-              echo "Changing to working directory: << parameters.working-directory >>"
-              cd << parameters.working-directory >>
-              echo "PWD after cd: $(pwd)"
-            fi
-            echo "Contents of current directory:"
-            ls -la
-            echo "Contents of hokusai directory (if exists):"
-            ls -la hokusai/ 2>/dev/null || echo "hokusai/ directory not found"
-            echo "Dockerfile exists:" $(test -f Dockerfile && echo "YES" || echo "NO")
-            echo "=== End Working Directory Test ==="
