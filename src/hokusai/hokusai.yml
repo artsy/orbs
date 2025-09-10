@@ -1,4 +1,4 @@
-# Orb Version 0.23.0
+# Orb Version 0.24.0
 
 
 version: 2.1
@@ -63,6 +63,10 @@ commands:
       remote_docker_version:
         type: string
         default: docker23
+      working-directory:
+        type: string
+        default: ""
+        description: Optional working directory for hokusai commands
     steps:
       - setup-docker:
           remote_docker_version: << parameters.remote_docker_version >>
@@ -70,6 +74,10 @@ commands:
           name: Push
           command: |
             set +euo pipefail
+
+            if [ "<< parameters.working-directory >>" != "" ]; then
+              cd << parameters.working-directory >>
+            fi
 
             if hokusai registry images --tag-exists "$CIRCLE_SHA1" >/dev/null
             then
@@ -88,10 +96,18 @@ commands:
         type: string
         default: ""
         description: Optional hokusai flags
+      working-directory:
+        type: string
+        default: ""
+        description: Optional working directory for hokusai commands
     steps:
       - run:
           name: Test
           command: |
+            if [ "<< parameters.working-directory >>" != "" ]; then
+              cd << parameters.working-directory >>
+            fi
+
             if [ "<< parameters.filename >>" != "" ]; then
               hokusai test -f << parameters.filename >> << parameters.flags >>
             else
@@ -127,12 +143,17 @@ jobs:
         type: string
         default: docker23
         description: specify circleci remote docker version
+      working-directory:
+        type: string
+        default: ""
+        description: Optional working directory for hokusai commands
     steps:
       - setup-docker:
           remote_docker_version: << parameters.remote_docker_version >>
       - run-tests:
           filename: << parameters.filename >>
           flags: << parameters.flags >>
+          working-directory: << parameters.working-directory >>
 
   push:
     executor: << parameters.executor >>
@@ -143,9 +164,14 @@ jobs:
       remote_docker_version:
         type: string
         default: docker23
+      working-directory:
+        type: string
+        default: ""
+        description: Optional working directory for hokusai commands
     steps:
       - push-image:
           remote_docker_version: << parameters.remote_docker_version >>
+          working-directory: << parameters.working-directory >>
 
   deploy-staging:
     executor: << parameters.executor >>
@@ -160,16 +186,28 @@ jobs:
         type: string
         description: How long to wait for shell output before timing out
         default: 20m
+      working-directory:
+        type: string
+        default: ""
+        description: Optional working directory for hokusai commands
     steps:
       - setup
       - install-aws-iam-authenticator
       - configure-hokusai
       - run:
           name: Validate Kubernetes Yaml
-          command: hokusai staging update --skip-checks --dry-run
+          command: |
+            if [ "<< parameters.working-directory >>" != "" ]; then
+              cd << parameters.working-directory >>
+            fi
+            hokusai staging update --skip-checks --dry-run
       - run:
           name: Deploy
-          command: hokusai staging deploy $CIRCLE_SHA1 --update-config
+          command: |
+            if [ "<< parameters.working-directory >>" != "" ]; then
+              cd << parameters.working-directory >>
+            fi
+            hokusai staging deploy $CIRCLE_SHA1 --update-config
           no_output_timeout: << parameters.time-out >>
       - git-push-staging-branch-command:
           project-name: << parameters.project-name >>
@@ -194,11 +232,19 @@ jobs:
       executor:
         type: executor
         default: deploy
+      working-directory:
+        type: string
+        default: ""
+        description: Optional working directory for hokusai commands
     steps:
       - setup
       - run:
           name: retag staging
-          command: hokusai registry retag staging $CIRCLE_SHA1
+          command: |
+            if [ "<< parameters.working-directory >>" != "" ]; then
+              cd << parameters.working-directory >>
+            fi
+            hokusai registry retag staging $CIRCLE_SHA1
 
   deploy-production:
     executor: << parameters.executor >>
@@ -210,20 +256,40 @@ jobs:
         type: string
         description: How long to wait for shell output before timing out
         default: 20m
+      working-directory:
+        type: string
+        default: ""
+        description: Optional working directory for hokusai commands
     steps:
       - setup
       - install-aws-iam-authenticator
       - configure-hokusai
       - run:
           name: Validate Kubernetes Yaml
-          command: hokusai production update --skip-checks --dry-run
+          command: |
+            if [ "<< parameters.working-directory >>" != "" ]; then
+              cd << parameters.working-directory >>
+            fi
+            hokusai production update --skip-checks --dry-run
       - run:
           name: What's being deployed
-          command: hokusai pipeline gitcompare --org-name artsy || true
+          command: |
+            if [ "<< parameters.working-directory >>" != "" ]; then
+              cd << parameters.working-directory >>
+            fi
+            hokusai pipeline gitcompare --org-name artsy || true
       - run:
           name: Changes with migrations
-          command: hokusai pipeline gitlog | grep migration || true
+          command: |
+            if [ "<< parameters.working-directory >>" != "" ]; then
+              cd << parameters.working-directory >>
+            fi
+            hokusai pipeline gitlog | grep migration || true
       - run:
           name: Deploy
-          command: hokusai pipeline promote --update-config
+          command: |
+            if [ "<< parameters.working-directory >>" != "" ]; then
+              cd << parameters.working-directory >>
+            fi
+            hokusai pipeline promote --update-config
           no_output_timeout: << parameters.time-out >>
