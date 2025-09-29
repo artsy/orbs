@@ -32,6 +32,7 @@ jobs:
     environment:
       AUTO_VERSION: << parameters.version >>
     steps:
+      - run: corepack enable
       - yarn/pre-release
       - auto/shipit:
           arguments: << parameters.args >>
@@ -55,6 +56,7 @@ jobs:
       - utils/skip-if-fork-or-not-pr:
           pr-skip-message: Skipping, only deploys canaries on PR builds
           fork-skip-message: Skipping, can't deploy canaries from a fork
+      - run: corepack enable
       - yarn/pre-release
       - auto/canary:
           arguments: << parameters.args >>
