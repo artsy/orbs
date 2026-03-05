@@ -1,4 +1,4 @@
-# Orb Version 0.1.24
+# Orb Version 0.1.25
 
 version: 2.1
 description: >
@@ -198,8 +198,7 @@ jobs:
     steps:
       - add_ssh_keys
       - checkout
-      - setup_remote_docker:
-          version: 20.10.24
+      - setup_remote_docker
       - test
 
   build:
@@ -225,8 +224,7 @@ jobs:
           artsy_docker_port: << parameters.artsy_docker_port >>
           artsy_s3_path_root: << parameters.artsy_s3_path_root >>
       - build-image-via-artsy
-      - setup_remote_docker:
-          version: 20.10.24
+      - setup_remote_docker
       - build-image-via-circle
 
   buildkit-build:
