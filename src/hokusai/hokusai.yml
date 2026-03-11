@@ -1,4 +1,4 @@
-# Orb Version 0.25.0
+# Orb Version 0.26.0
 
 
 version: 2.1
@@ -28,7 +28,7 @@ commands:
     parameters:
       remote_docker_version:
         type: string
-        default: docker23
+        default: default
     steps:
       - setup
       - setup_remote_docker:
@@ -62,7 +62,7 @@ commands:
     parameters:
       remote_docker_version:
         type: string
-        default: docker23
+        default: default
       working-directory:
         type: string
         default: ""
@@ -141,7 +141,7 @@ jobs:
         description: Optional hokusai flags
       remote_docker_version:
         type: string
-        default: docker23
+        default: default
         description: specify circleci remote docker version
       working-directory:
         type: string
@@ -163,7 +163,7 @@ jobs:
         default: deploy
       remote_docker_version:
         type: string
-        default: docker23
+        default: default
       working-directory:
         type: string
         default: ""
