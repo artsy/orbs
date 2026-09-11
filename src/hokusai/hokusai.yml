@@ -192,6 +192,13 @@ jobs:
           Optional hokusai --timeout override in seconds (sets progressDeadlineSeconds).
           Defaults to hokusai's own default (600s).
         default: ""
+      filename:
+        type: string
+        description: >
+          Optional Kubernetes Yaml file to deploy instead of the default
+          ./hokusai/staging.yml, e.g. to scope a deploy (and rollout-timeout)
+          to one Deployment's own file.
+        default: ""
       working-directory:
         type: string
         default: ""
@@ -206,18 +213,25 @@ jobs:
             if [ "<< parameters.working-directory >>" != "" ]; then
               cd << parameters.working-directory >>
             fi
-            hokusai staging update --skip-checks --dry-run
+            if [ "<< parameters.filename >>" != "" ]; then
+              hokusai staging update --skip-checks --dry-run --filename << parameters.filename >>
+            else
+              hokusai staging update --skip-checks --dry-run
+            fi
       - run:
           name: Deploy
           command: |
             if [ "<< parameters.working-directory >>" != "" ]; then
               cd << parameters.working-directory >>
             fi
-            if [ "<< parameters.rollout-timeout >>" != "" ]; then
-              hokusai staging deploy $CIRCLE_SHA1 --update-config --timeout << parameters.rollout-timeout >>
-            else
-              hokusai staging deploy $CIRCLE_SHA1 --update-config
+            EXTRA_ARGS=""
+            if [ "<< parameters.filename >>" != "" ]; then
+              EXTRA_ARGS="$EXTRA_ARGS --filename << parameters.filename >>"
             fi
+            if [ "<< parameters.rollout-timeout >>" != "" ]; then
+              EXTRA_ARGS="$EXTRA_ARGS --timeout << parameters.rollout-timeout >>"
+            fi
+            hokusai staging deploy $CIRCLE_SHA1 --update-config $EXTRA_ARGS
           no_output_timeout: << parameters.time-out >>
       - git-push-staging-branch-command:
           project-name: << parameters.project-name >>
@@ -272,6 +286,13 @@ jobs:
           Optional hokusai --timeout override in seconds (sets progressDeadlineSeconds).
           Defaults to hokusai's own default (600s).
         default: ""
+      filename:
+        type: string
+        description: >
+          Optional Kubernetes Yaml file to deploy instead of the default
+          ./hokusai/production.yml, e.g. to scope a deploy (and
+          rollout-timeout) to one Deployment's own file.
+        default: ""
       working-directory:
         type: string
         default: ""
@@ -286,7 +307,11 @@ jobs:
             if [ "<< parameters.working-directory >>" != "" ]; then
               cd << parameters.working-directory >>
             fi
-            hokusai production update --skip-checks --dry-run
+            if [ "<< parameters.filename >>" != "" ]; then
+              hokusai production update --skip-checks --dry-run --filename << parameters.filename >>
+            else
+              hokusai production update --skip-checks --dry-run
+            fi
       - run:
           name: What's being deployed
           command: |
@@ -307,9 +332,12 @@ jobs:
             if [ "<< parameters.working-directory >>" != "" ]; then
               cd << parameters.working-directory >>
             fi
-            if [ "<< parameters.rollout-timeout >>" != "" ]; then
-              hokusai pipeline promote --update-config --timeout << parameters.rollout-timeout >>
-            else
-              hokusai pipeline promote --update-config
+            EXTRA_ARGS=""
+            if [ "<< parameters.filename >>" != "" ]; then
+              EXTRA_ARGS="$EXTRA_ARGS --filename << parameters.filename >>"
             fi
+            if [ "<< parameters.rollout-timeout >>" != "" ]; then
+              EXTRA_ARGS="$EXTRA_ARGS --timeout << parameters.rollout-timeout >>"
+            fi
+            hokusai pipeline promote --update-config $EXTRA_ARGS
           no_output_timeout: << parameters.time-out >>
