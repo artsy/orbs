@@ -1,4 +1,4 @@
-# Orb Version 0.26.0
+# Orb Version 0.27.0
 
 
 version: 2.1
@@ -186,6 +186,12 @@ jobs:
         type: string
         description: How long to wait for shell output before timing out
         default: 20m
+      rollout-timeout:
+        type: string
+        description: >
+          Optional hokusai --timeout override in seconds (sets progressDeadlineSeconds, distinct from time-out above).
+          Defaults to hokusai's own default (600s).
+        default: ""
       working-directory:
         type: string
         default: ""
@@ -207,7 +213,11 @@ jobs:
             if [ "<< parameters.working-directory >>" != "" ]; then
               cd << parameters.working-directory >>
             fi
-            hokusai staging deploy $CIRCLE_SHA1 --update-config
+            if [ "<< parameters.rollout-timeout >>" != "" ]; then
+              hokusai staging deploy $CIRCLE_SHA1 --update-config --timeout << parameters.rollout-timeout >>
+            else
+              hokusai staging deploy $CIRCLE_SHA1 --update-config
+            fi
           no_output_timeout: << parameters.time-out >>
       - git-push-staging-branch-command:
           project-name: << parameters.project-name >>
@@ -256,6 +266,12 @@ jobs:
         type: string
         description: How long to wait for shell output before timing out
         default: 20m
+      rollout-timeout:
+        type: string
+        description: >
+          Optional hokusai --timeout override in seconds (sets progressDeadlineSeconds, distinct from time-out above).
+          Defaults to hokusai's own default (600s).
+        default: ""
       working-directory:
         type: string
         default: ""
@@ -291,5 +307,9 @@ jobs:
             if [ "<< parameters.working-directory >>" != "" ]; then
               cd << parameters.working-directory >>
             fi
-            hokusai pipeline promote --update-config
+            if [ "<< parameters.rollout-timeout >>" != "" ]; then
+              hokusai pipeline promote --update-config --timeout << parameters.rollout-timeout >>
+            else
+              hokusai pipeline promote --update-config
+            fi
           no_output_timeout: << parameters.time-out >>
