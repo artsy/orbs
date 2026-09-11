@@ -189,7 +189,7 @@ jobs:
       rollout-timeout:
         type: string
         description: >
-          Optional hokusai --timeout override in seconds (sets progressDeadlineSeconds.
+          Optional hokusai --timeout override in seconds (sets progressDeadlineSeconds).
           Defaults to hokusai's own default (600s).
         default: ""
       working-directory:
@@ -269,7 +269,7 @@ jobs:
       rollout-timeout:
         type: string
         description: >
-          Optional hokusai --timeout override in seconds (sets progressDeadlineSeconds.
+          Optional hokusai --timeout override in seconds (sets progressDeadlineSeconds).
           Defaults to hokusai's own default (600s).
         default: ""
       working-directory:
