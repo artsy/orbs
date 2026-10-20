@@ -38,7 +38,7 @@ commands:
     parameters:
       uri:
         type: string
-        default: "https://github.com/kubernetes-sigs/aws-iam-authenticator/releases/download/v0.7.22/aws-iam-authenticator_0.7.22_linux_amd64"
+        default: "https://artsy-provisioning-public.s3.amazonaws.com/aws-iam-authenticator_0.7.22_linux_amd64"
     steps:
       - run:
           name: Install AWS IAM Authenticator
