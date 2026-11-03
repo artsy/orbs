@@ -16,15 +16,23 @@ executors:
       - image: cimg/node:<< parameters.node-version >>
 commands:
   # npm trusted publishing (OIDC): https://docs.npmjs.com/trusted-publishers
-  # Needs Node >= 22.14 and npm >= 11.5.1. npm tries OIDC first and falls back
-  # to NPM_TOKEN, so packages without a trusted publisher keep working.
+  # Needs Node >= 22.14 and npm >= 11.11.0 (first npm with CircleCI OIDC).
+  # npm tries OIDC first and falls back to NPM_TOKEN, so packages without a
+  # trusted publisher keep working.
   setup-npm-trusted-publishing:
     steps:
+      - run:
+          name: Check Node version
+          command: |
+            node -e 'const [a, b] = process.versions.node.split(".").map(Number); if (a < 22 || (a === 22 && b < 14)) { console.error("artsy/auto >= 3.0.0 needs node-version >= 22.14, got " + process.version); process.exit(1) }'
       - run:
           name: Install npm with trusted publishing support
           command: sudo npm install -g npm@11.20.0
       - run:
           name: Get npm OIDC token
+          # \$(...) is escaped on purpose: BASH_ENV re-runs it at the start of
+          # every later step, so each step gets a fresh token (1h lifetime) and
+          # a failed mint exports an empty value and falls back to NPM_TOKEN.
           command: |
             echo "export NPM_ID_TOKEN=\"\$(circleci run oidc get --claims '{\"aud\": \"npm:registry.npmjs.org\"}')\"" >> "$BASH_ENV"
 jobs:

@@ -18,4 +18,10 @@ npm trust circleci <package> \
   --context-id <npm-deploy-context-id> --allow-publish
 ```
 
-If you override `node-version`, it must be >= 22.14.
+If you override `node-version`, it must be >= 22.14. The job fails early otherwise.
+
+Monorepos publish through `lerna publish`, not `npm publish`, and only lerna >= 10 supports CircleCI trusted publishing. On an older lerna the package keeps publishing with `NPM_TOKEN`.
+
+### Debugging
+
+npm logs OIDC failures only at verbose level and then falls back to `NPM_TOKEN`. Once `NPM_TOKEN` is gone, a misconfigured trusted publisher shows up as a plain `E401`/`E404`. Set `NPM_CONFIG_LOGLEVEL=verbose` on the job to see why the OIDC exchange failed.
