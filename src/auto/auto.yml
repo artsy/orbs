@@ -1,4 +1,4 @@
-# Orb Version 2.3.0
+# Orb Version 3.0.0
 
 version: 2.1
 description: Publish NPM packages and canary deployments with Intuit's Auto
@@ -11,15 +11,37 @@ executors:
     parameters:
       node-version:
         type: string
-        default: "14.18.1"
+        default: "22.23.4"
     docker:
       - image: cimg/node:<< parameters.node-version >>
+commands:
+  # npm trusted publishing (OIDC): https://docs.npmjs.com/trusted-publishers
+  # Needs Node >= 22.14 and npm >= 11.11.0 (first npm with CircleCI OIDC).
+  # Setting up a package locally needs npm >= 11.15.0 instead: see README.
+  # npm tries OIDC first and falls back to NPM_TOKEN, so packages without a
+  # trusted publisher keep working.
+  setup-npm-trusted-publishing:
+    steps:
+      - run:
+          name: Check Node version
+          command: |
+            node -e 'const [a, b] = process.versions.node.split(".").map(Number); if (a < 22 || (a === 22 && b < 14)) { console.error("artsy/auto >= 3.0.0 needs node-version >= 22.14, got " + process.version); process.exit(1) }'
+      - run:
+          name: Install npm with trusted publishing support
+          command: sudo npm install -g npm@11.20.0
+      - run:
+          name: Get npm OIDC token
+          # \$(...) is escaped on purpose: BASH_ENV re-runs it at the start of
+          # every later step, so each step gets a fresh token (1h lifetime) and
+          # a failed mint exports an empty value and falls back to NPM_TOKEN.
+          command: |
+            echo "export NPM_ID_TOKEN=\"\$(circleci run oidc get --claims '{\"aud\": \"npm:registry.npmjs.org\"}')\"" >> "$BASH_ENV"
 jobs:
   publish:
     parameters:
       node-version:
         type: string
-        default: "14.18.1"
+        default: "22.23.4"
       version:
         type: string
         default: v11.3.0
@@ -33,13 +55,14 @@ jobs:
       AUTO_VERSION: << parameters.version >>
     steps:
       - yarn/pre-release
+      - setup-npm-trusted-publishing
       - auto/shipit:
           arguments: << parameters.args >>
   publish-canary:
     parameters:
       node-version:
         type: string
-        default: "14.18.1"
+        default: "22.23.4"
       version:
         type: string
         default: v11.3.0
@@ -56,5 +79,6 @@ jobs:
           pr-skip-message: Skipping, only deploys canaries on PR builds
           fork-skip-message: Skipping, can't deploy canaries from a fork
       - yarn/pre-release
+      - setup-npm-trusted-publishing
       - auto/canary:
           arguments: << parameters.args >>
