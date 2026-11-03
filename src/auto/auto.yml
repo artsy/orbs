@@ -17,6 +17,7 @@ executors:
 commands:
   # npm trusted publishing (OIDC): https://docs.npmjs.com/trusted-publishers
   # Needs Node >= 22.14 and npm >= 11.11.0 (first npm with CircleCI OIDC).
+  # Setting up a package locally needs npm >= 11.15.0 instead: see README.
   # npm tries OIDC first and falls back to NPM_TOKEN, so packages without a
   # trusted publisher keep working.
   setup-npm-trusted-publishing:

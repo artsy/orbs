@@ -8,7 +8,7 @@ If you're making a generic change about how `auto` executes, it's recommended yo
 
 Since 3.0.0 the `publish` and `publish-canary` jobs run on Node 22 with npm 11 and request a CircleCI OIDC token (`NPM_ID_TOKEN`) for [npm trusted publishing](https://docs.npmjs.com/trusted-publishers). npm tries OIDC first and falls back to `NPM_TOKEN`, so a package without a trusted publisher keeps publishing with the token.
 
-To set up a package (npm >= 11.15.0, logged in with publish rights and 2FA):
+To set up a package, run this locally with npm >= 11.15.0 (the first version with `--allow-publish`), logged in with publish rights and 2FA. The CI job only needs npm >= 11.11.0 to publish.
 
 ```sh
 npm trust circleci <package> \
