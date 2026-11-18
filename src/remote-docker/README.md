@@ -32,8 +32,9 @@ workflows:
 
 Builds and pushes in one job on CircleCI remote Docker, with a BuildKit cache
 stored in the project's ECR repo (tag `buildcache-<target>`). The image tag is
-`$CIRCLE_SHA1<tag_suffix>`, where `tag_suffix` defaults to `-<target>` when a
-target is set (like the BuildKit jobs above). Needs the `hokusai` context (AWS credentials).
+`$CIRCLE_SHA1-<target>`, or `$CIRCLE_SHA1` with no target (like the BuildKit jobs
+above). Omit `target` for the image you deploy: hokusai deploys `$CIRCLE_SHA1`.
+Needs the `hokusai` context (AWS credentials).
 
 The cache tag is shared by all branches, so the last build to push wins. A branch
 with different dependencies may build cold the first time after another branch pushes.

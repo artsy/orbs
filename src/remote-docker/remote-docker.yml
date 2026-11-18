@@ -184,8 +184,6 @@ commands:
     parameters:
       target:
         type: string
-      tag_suffix:
-        type: string
       build_args:
         type: string
     steps:
@@ -198,10 +196,8 @@ commands:
             PROJECT=$(awk '/^project-name:/ {print $2}' hokusai/config.yml | tr -d "\"'")
             REPO=$(aws ecr describe-repositories --region "$REGION" --repository-names "$PROJECT" --query 'repositories[0].repositoryUri' --output text)
             TARGET="<< parameters.target >>"
-            SUFFIX="<< parameters.tag_suffix >>"
-            # Default to -<target> so a stage build can never take the main image's tag.
-            if [ -z "$SUFFIX" ] && [ -n "$TARGET" ]; then SUFFIX="-$TARGET"; fi
-            TAG="${CIRCLE_SHA1}${SUFFIX}"
+            # A stage build gets -<target> so it can never take the main image's tag.
+            TAG="${CIRCLE_SHA1}${TARGET:+-$TARGET}"
 
             if hokusai registry images --tag-exists "$TAG" >/dev/null; then
               echo "Skipping build as the tag $TAG already exists in the Docker registry"
@@ -339,11 +335,7 @@ jobs:
       target:
         type: string
         default: ""
-        description: Dockerfile stage to build. Empty builds the final stage.
-      tag_suffix:
-        type: string
-        default: ""
-        description: Appended to $CIRCLE_SHA1 to form the image tag. Defaults to "-<target>" when target is set.
+        description: Dockerfile stage to build, tagged $CIRCLE_SHA1-<target>. Empty builds the final stage, tagged $CIRCLE_SHA1.
       build_args:
         type: string
         default: ""
@@ -354,5 +346,4 @@ jobs:
       - setup_remote_docker
       - buildx-build-push-image:
           target: << parameters.target >>
-          tag_suffix: << parameters.tag_suffix >>
           build_args: << parameters.build_args >>
