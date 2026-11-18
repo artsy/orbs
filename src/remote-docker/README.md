@@ -32,7 +32,8 @@ workflows:
 
 Builds and pushes in one job on CircleCI remote Docker, with a BuildKit cache
 stored in the project's ECR repo (tag `buildcache-<target>`). The image tag is
-`$CIRCLE_SHA1<tag_suffix>`. Needs the `hokusai` context (AWS credentials).
+`$CIRCLE_SHA1<tag_suffix>`, where `tag_suffix` defaults to `-<target>` when a
+target is set (like the BuildKit jobs above). Needs the `hokusai` context (AWS credentials).
 
 ```yaml
 workflows:
@@ -42,6 +43,5 @@ workflows:
           name: tester-image-push
           context: [bundle-github, hokusai]
           target: tester
-          tag_suffix: -tester
           build_args: BUNDLE_GITHUB__COM
 ```

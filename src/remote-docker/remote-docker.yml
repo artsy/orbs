@@ -197,8 +197,11 @@ commands:
             REGION="${AWS_DEFAULT_REGION:-us-east-1}"
             PROJECT=$(awk '/^project-name:/ {print $2}' hokusai/config.yml | tr -d "\"'")
             REPO=$(aws ecr describe-repositories --region "$REGION" --repository-names "$PROJECT" --query 'repositories[0].repositoryUri' --output text)
-            TAG="${CIRCLE_SHA1}<< parameters.tag_suffix >>"
             TARGET="<< parameters.target >>"
+            SUFFIX="<< parameters.tag_suffix >>"
+            # Default to -<target> so a stage build can never take the main image's tag.
+            if [ -z "$SUFFIX" ] && [ -n "$TARGET" ]; then SUFFIX="-$TARGET"; fi
+            TAG="${CIRCLE_SHA1}${SUFFIX}"
 
             if hokusai registry images --tag-exists "$TAG" >/dev/null; then
               echo "Skipping build as the tag $TAG already exists in the Docker registry"
@@ -337,7 +340,7 @@ jobs:
       tag_suffix:
         type: string
         default: ""
-        description: Appended to $CIRCLE_SHA1 to form the image tag, e.g. "-tester".
+        description: Appended to $CIRCLE_SHA1 to form the image tag. Defaults to "-<target>" when target is set.
       build_args:
         type: string
         default: ""
