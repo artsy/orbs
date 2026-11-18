@@ -28,7 +28,7 @@ workflows:
       - artsy-remote-docker/build
 ```
 
-## buildx-build-push (no Artsy dockerd)
+## buildx-build-push
 
 Builds and pushes in one job on CircleCI remote Docker, with a BuildKit cache
 stored in the project's ECR repo (tag `buildcache-<target>`). The image tag is
