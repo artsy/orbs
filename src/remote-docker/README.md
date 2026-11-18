@@ -35,6 +35,9 @@ stored in the project's ECR repo (tag `buildcache-<target>`). The image tag is
 `$CIRCLE_SHA1<tag_suffix>`, where `tag_suffix` defaults to `-<target>` when a
 target is set (like the BuildKit jobs above). Needs the `hokusai` context (AWS credentials).
 
+The cache tag is shared by all branches, so the last build to push wins. A branch
+with different dependencies may build cold the first time after another branch pushes.
+
 ```yaml
 workflows:
   default:

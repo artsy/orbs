@@ -213,7 +213,10 @@ commands:
             docker buildx create --use --driver docker-container >/dev/null
 
             ARGS=(--platform linux/amd64)
+            # Unquoted on purpose: split on spaces and expand $VARS; set -f stops globbing.
+            set -f
             for arg in << parameters.build_args >>; do ARGS+=(--build-arg "$arg"); done
+            set +f
             if [ -n "$TARGET" ]; then ARGS+=(--target "$TARGET"); fi
             CACHE="type=registry,ref=${REPO}:buildcache-${TARGET:-default}"
 
