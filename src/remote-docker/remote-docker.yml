@@ -1,4 +1,4 @@
-# Orb Version 0.1.25
+# Orb Version 0.2.0
 
 version: 2.1
 description: >
@@ -180,6 +180,51 @@ commands:
               printf "%s Image pushed.\n" "$(TZ=UTC date)"
             fi
 
+  buildx-build-push-image:
+    parameters:
+      target:
+        type: string
+      build_args:
+        type: string
+    steps:
+      - run:
+          name: Build & Push via BuildKit with ECR registry cache
+          no_output_timeout: 15m
+          command: |
+            set -euo pipefail
+            REGION="${AWS_DEFAULT_REGION:-us-east-1}"
+            PROJECT=$(awk '/^project-name:/ {print $2}' hokusai/config.yml | tr -d "\"'")
+            REPO=$(aws ecr describe-repositories --region "$REGION" --repository-names "$PROJECT" --query 'repositories[0].repositoryUri' --output text)
+            TARGET="<< parameters.target >>"
+            # A stage build gets -<target> so it can never take the main image's tag.
+            TAG="${CIRCLE_SHA1}${TARGET:+-$TARGET}"
+
+            if hokusai registry images --tag-exists "$TAG" >/dev/null; then
+              echo "Skipping build as the tag $TAG already exists in the Docker registry"
+              exit 0
+            fi
+
+            docker buildx version >/dev/null 2>&1 || apk add --no-cache --quiet docker-cli-buildx
+            aws ecr get-login-password --region "$REGION" | docker login -u AWS --password-stdin "${REPO%%/*}"
+            docker buildx create --use --driver docker-container >/dev/null
+
+            ARGS=(--platform linux/amd64)
+            # Unquoted on purpose: split on spaces and expand $VARS; set -f stops globbing.
+            set -f
+            for arg in << parameters.build_args >>; do ARGS+=(--build-arg "$arg"); done
+            set +f
+            if [ -n "$TARGET" ]; then ARGS+=(--target "$TARGET"); fi
+            CACHE="type=registry,ref=${REPO}:buildcache-${TARGET:-default}"
+
+            printf "%s Building and pushing %s:%s...\n" "$(TZ=UTC date)" "$REPO" "$TAG"
+            docker buildx build --progress plain \
+              "${ARGS[@]}" \
+              --cache-from "$CACHE" \
+              --cache-to "${CACHE},mode=max,image-manifest=true,oci-mediatypes=true" \
+              --provenance=false \
+              --tag "${REPO}:${TAG}" --push .
+            printf "%s Image pushed.\n" "$(TZ=UTC date)"
+
   test:
     steps:
       - run: hokusai registry pull --tag "$CIRCLE_SHA1"
@@ -274,3 +319,31 @@ jobs:
           artsy_docker_port: << parameters.artsy_docker_port >>
           artsy_s3_path_root: << parameters.artsy_s3_path_root >>
       - buildkit-push-image-via-artsy
+
+  # Builds on CircleCI remote Docker with a BuildKit cache in the project's ECR repo
+  # (tag buildcache-<target>). Replaces the dockerd-based jobs above.
+  buildx-build-push:
+    executor: << parameters.executor >>
+    resource_class: << parameters.resource_class >>
+    parameters:
+      executor:
+        type: executor
+        default: deploy
+      resource_class:
+        type: string
+        default: large
+      target:
+        type: string
+        default: ""
+        description: Dockerfile stage to build, tagged $CIRCLE_SHA1-<target>. Empty builds the final stage, tagged $CIRCLE_SHA1.
+      build_args:
+        type: string
+        default: ""
+        description: Space-separated NAME or NAME=value build args, e.g. "BUNDLE_GITHUB__COM SENTRY_RELEASE=$CIRCLE_SHA1".
+    steps:
+      - add_ssh_keys
+      - checkout
+      - setup_remote_docker
+      - buildx-build-push-image:
+          target: << parameters.target >>
+          build_args: << parameters.build_args >>
