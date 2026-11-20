@@ -1,0 +1,141 @@
+# Orb Version 0.1.0
+
+version: 2.1
+description: >
+  Run Semgrep and OSV-Scanner static analysis in CI and, when a DefectDojo
+  instance is reachable, import the results into it. Findings never gate the
+  build; a missing or unreadable report does.
+
+executors:
+  scanner:
+    machine:
+      image: ubuntu-2404:current
+    resource_class: medium
+
+commands:
+  semgrep-scan:
+    description: Run Semgrep against the checkout and write a SARIF report.
+    parameters:
+      output-file:
+        type: string
+        default: reports/semgrep.sarif
+    steps:
+      - run:
+          name: Semgrep (SAST)
+          command: |
+            mkdir -p "$(dirname "<< parameters.output-file >>")"
+            docker run --rm --entrypoint semgrep -v "$PWD:/src" -w /src \
+              semgrep/semgrep:latest scan \
+              --config p/security-audit \
+              --config p/owasp-top-ten \
+              --sarif \
+              --output "<< parameters.output-file >>" \
+              --metrics off \
+              --disable-version-check \
+              .
+
+  osv-scan:
+    description: Run OSV-Scanner against the checkout and write a SARIF report.
+    parameters:
+      output-file:
+        type: string
+        default: reports/osv.sarif
+    steps:
+      - run:
+          name: OSV-Scanner (SCA)
+          command: |
+            mkdir -p "$(dirname "<< parameters.output-file >>")"
+            # osv-scanner exits 1 when it finds vulnerabilities; only that is tolerated.
+            docker run --rm -v "$PWD:/src" -w /src \
+              ghcr.io/google/osv-scanner:latest scan source -r . \
+              --format sarif \
+              --output-file "<< parameters.output-file >>" || [ "$?" -eq 1 ]
+
+  import-to-defectdojo:
+    description: >
+      Validate and import the SARIF reports. Dry-runs (validates and prints a
+      summary, exits 0) unless both DEFECTDOJO_URL and DEFECTDOJO_TOKEN are set
+      in the environment; imports use reimport-scan against one long-lived
+      engagement with close_old_findings.
+    parameters:
+      report-dir:
+        type: string
+        default: reports
+      product-name:
+        type: string
+        default: ""
+    steps:
+      - run:
+          name: Install jq
+          command: command -v jq >/dev/null || (sudo apt-get update && sudo apt-get install -y jq)
+      - run:
+          name: Import reports into DefectDojo
+          command: |
+            set -euo pipefail
+            report_dir="<< parameters.report-dir >>"
+            product="<< parameters.product-name >>"
+            [ -n "$product" ] || product="${CIRCLE_PROJECT_REPONAME:-metaphysics}"
+            engagement="$product"
+
+            dry_run=1
+            if [ -n "${DEFECTDOJO_URL:-}" ] && [ -n "${DEFECTDOJO_TOKEN:-}" ]; then
+              dry_run=0
+            else
+              echo "DEFECTDOJO_URL / DEFECTDOJO_TOKEN not set: dry run, nothing uploaded."
+            fi
+
+            count_sarif() { jq '[.runs[]?.results[]?] | length' "$1"; }
+            printf '%-14s %-8s %s\n' "SCAN_TYPE" "FINDINGS" "STATUS"
+            failed=0
+            for file in semgrep.sarif osv.sarif; do
+              path="$report_dir/$file"
+              if [ ! -s "$path" ]; then
+                printf '%-14s %-8s %s\n' "SARIF" "-" "MISSING $path"
+                failed=$((failed+1)); continue
+              fi
+              findings="$(count_sarif "$path" 2>/dev/null)" || {
+                printf '%-14s %-8s %s\n' "SARIF" "-" "INVALID JSON $path"
+                failed=$((failed+1)); continue
+              }
+              if [ "$dry_run" -eq 1 ]; then
+                printf '%-14s %-8s %s\n' "SARIF" "$findings" "validated (dry run)"
+                continue
+              fi
+              body="$(mktemp)"
+              code="$(curl -sS --retry 2 -o "$body" -w '%{http_code}' \
+                -H "Authorization: Token ${DEFECTDOJO_TOKEN}" \
+                -F "file=@${path}" \
+                -F "scan_type=SARIF" \
+                -F "engagement_name=${engagement}" \
+                -F "product_name=${product}" \
+                -F "product_type_name=Research and Development" \
+                -F "auto_create_context=true" \
+                -F "active=true" \
+                -F "verified=false" \
+                -F "close_old_findings=true" \
+                -F "tags=sast" \
+                -F "tags=circleci" \
+                "${DEFECTDOJO_URL%/}/api/v2/reimport-scan/")" || code=000
+              if [ "$code" -ge 200 ] && [ "$code" -lt 300 ]; then
+                printf '%-14s %-8s %s\n' "SARIF" "$findings" "imported (HTTP $code)"
+              else
+                printf '%-14s %-8s %s\n' "SARIF" "$findings" "FAILED (HTTP $code) $(head -c 200 "$body")"
+                failed=$((failed+1))
+              fi
+              rm -f "$body"
+            done
+            echo
+            echo "engagement: ${product} / ${engagement}"
+            [ "$failed" -eq 0 ] || { echo "ERROR: ${failed} report(s) missing, invalid or failed to import."; exit 1; }
+
+jobs:
+  sast:
+    description: Run Semgrep + OSV-Scanner and (optionally) import the results.
+    executor: scanner
+    steps:
+      - checkout
+      - semgrep-scan
+      - osv-scan
+      - store_artifacts:
+          path: reports
+      - import-to-defectdojo
