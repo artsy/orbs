@@ -24,7 +24,7 @@ commands:
           command: |
             mkdir -p "$(dirname "<< parameters.output-file >>")"
             docker run --rm --entrypoint semgrep -v "$PWD:/src" -w /src \
-              semgrep/semgrep:latest scan \
+              semgrep/semgrep:1.185.0@sha256:67518c174185a2043fdbed16c70631b79209499b3671178e7194379b48295a0d scan \
               --config p/security-audit \
               --config p/owasp-top-ten \
               --sarif \
@@ -47,7 +47,7 @@ commands:
             # osv-scanner exits 1 when it finds vulnerabilities; only that is tolerated.
             # --allow-no-lockfiles: repos with nothing to scan exit 0 (else 128, no SARIF).
             docker run --rm -v "$PWD:/src" -w /src \
-              ghcr.io/google/osv-scanner:latest scan source -r . \
+              ghcr.io/google/osv-scanner:v2.7.1@sha256:a70ffffc2bfd33482953e5d6b64c6fcdb30239717a07b0f0d3ab2859ce3e4cde scan source -r . \
               --allow-no-lockfiles --format sarif \
               --output-file "<< parameters.output-file >>" || [ "$?" -eq 1 ]
 
