@@ -45,9 +45,10 @@ commands:
           command: |
             mkdir -p "$(dirname "<< parameters.output-file >>")"
             # osv-scanner exits 1 when it finds vulnerabilities; only that is tolerated.
+            # --allow-no-lockfiles: repos with nothing to scan exit 0 (else 128, no SARIF).
             docker run --rm -v "$PWD:/src" -w /src \
               ghcr.io/google/osv-scanner:latest scan source -r . \
-              --format sarif \
+              --allow-no-lockfiles --format sarif \
               --output-file "<< parameters.output-file >>" || [ "$?" -eq 1 ]
 
 jobs:
