@@ -1,4 +1,4 @@
-# Orb Version 0.2.0
+# Orb Version 0.3.0
 
 version: 2.1
 description: >
@@ -186,6 +186,9 @@ commands:
         type: string
       build_args:
         type: string
+      secrets:
+        type: string
+        default: ""
     steps:
       - run:
           name: Build & Push via BuildKit with ECR registry cache
@@ -214,6 +217,11 @@ commands:
             for arg in << parameters.build_args >>; do ARGS+=(--build-arg "$arg"); done
             set +f
             if [ -n "$TARGET" ]; then ARGS+=(--target "$TARGET"); fi
+            # Build secrets: mounted in the build only, never stored in image layers or history.
+            for name in << parameters.secrets >>; do
+              if [ -z "${!name:-}" ]; then echo "Build secret $name is not set in the job environment" >&2; exit 1; fi
+              ARGS+=(--secret "id=$name,env=$name")
+            done
             CACHE="type=registry,ref=${REPO}:buildcache-${TARGET:-default}"
 
             printf "%s Building and pushing %s:%s...\n" "$(TZ=UTC date)" "$REPO" "$TAG"
@@ -339,7 +347,11 @@ jobs:
       build_args:
         type: string
         default: ""
-        description: Space-separated NAME or NAME=value build args, e.g. "BUNDLE_GITHUB__COM SENTRY_RELEASE=$CIRCLE_SHA1".
+        description: Space-separated NAME or NAME=value build args, e.g. "BUNDLE_GITHUB__COM SENTRY_RELEASE=$CIRCLE_SHA1". Visible in image history, so do not use for secrets.
+      secrets:
+        type: string
+        default: ""
+        description: Space-separated names of job environment variables to pass as BuildKit build secrets (--secret id=NAME,env=NAME). Read them in the Dockerfile with RUN --mount=type=secret,id=NAME,env=NAME. Not stored in the image.
     steps:
       - add_ssh_keys
       - checkout
@@ -347,3 +359,4 @@ jobs:
       - buildx-build-push-image:
           target: << parameters.target >>
           build_args: << parameters.build_args >>
+          secrets: << parameters.secrets >>

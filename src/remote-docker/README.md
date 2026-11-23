@@ -47,5 +47,13 @@ workflows:
           name: tester-image-push
           context: [bundle-github, hokusai]
           target: tester
-          build_args: BUNDLE_GITHUB__COM
+          secrets: BUNDLE_GITHUB__COM
+```
+
+Pass tokens with `secrets`, not `build_args`. A build arg is recorded in the image
+history, a secret is not. `secrets` lists job environment variable names; each is
+passed as `--secret id=NAME,env=NAME`. In the Dockerfile:
+
+```dockerfile
+RUN --mount=type=secret,id=BUNDLE_GITHUB__COM,env=BUNDLE_GITHUB__COM bundle install
 ```
